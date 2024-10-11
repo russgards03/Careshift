@@ -1,58 +1,39 @@
-<h1>Schedule</h1>
-<div class="dashboard-wrapper">
-    <div class="">
-        <table id="tablerecords">   
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Schedule</th>
-                </tr>
-            </thead>
-            <tbody>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Schedule</title>
+</head>
+<body>
+    <h1>Schedule</h1>
+    <div class="dashboard-wrapper">
+        <form method="POST" action="">
+            <div class="button-container">
+                <button type="submit" name="page" value="add-schedule">Add Schedule</button>
+                <button type="submit" name="page" value="edit-schedule">Edit Schedule</button>
+                <button type="submit" name="page" value="calendar">Calendar</button>
+            </div>
+        </form>
+        <div class="main_content">
             <?php
-                /* Display each employee's records located in the database */
-                if($employee->list_employees() != false){
-                    foreach($employee->list_employees() as $value){
-                        extract($value);
-                        ?>
-                        <tr>
-                            <td>
-                                <a href="#" onclick="fetchSchedule(<?php echo $emp_id; ?>)">
-                                    <?php echo $emp_lname.', '.$emp_fname;?>
-                                </a>
-                            </td>
-                            <td id="schedule-<?php echo $emp_id; ?>"> <!-- Placeholder for the schedule -->
-                                Click on the name to view schedule
-                            </td>
-                        </tr>
-                        <?php
-                    }
-                } else {
-                    ?>
-                    <tr>
-                        <td colspan="2">"No Record Found."</td>
-                    </tr>
-                <?php
+                $page = isset($_POST['page']) ? $_POST['page'] : 'calendar';
+
+                switch($page){
+                    case 'add-schedule':
+                        require_once 'schedule-module/add-sched.php';
+                        break;
+                    case 'edit-schedule':
+                        require_once 'schedule-module/edit-sched.php';
+                        break;
+                    case 'calendar':
+                    default:
+                        require_once 'schedule-module/calendar.php';
+                        break; 
                 }
             ?>
-            </tbody>
-        </table>
+        </div>
     </div>
-</div>
-
-<script>
-// Function to fetch schedule using Ajax
-function fetchSchedule(empId) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', 'schedule-module/view_schedule.php?emp_id=' + empId, true);
-    xhr.onload = function() {
-        if (this.status == 200) {
-            // Assuming the server returns the schedule as a string
-            document.getElementById('schedule-' + empId).innerHTML = this.responseText;
-        } else {
-            document.getElementById('schedule-' + empId).innerHTML = 'Error fetching schedule';
-        }
-    };
-    xhr.send();
-}
-</script>
+</body>
+</html>
