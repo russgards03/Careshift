@@ -73,3 +73,14 @@ CREATE TABLE `attendance` (
   PRIMARY KEY  (`att_id`),
   KEY (`emp_id`)
 );
+
+DROP TABLE IF EXISTS `leave`;
+CREATE TABLE `leave` (
+  `leave_id` int(50) NOT NULL auto_increment,
+  `emp_id` int(50) NOT NULL,
+  `leave_type` varchar(50) NOT NULL,
+  `leave_date` date NOT NULL,
+  `leave_desc` varchar(50) NOT NULL,
+  PRIMARY KEY  (`leave_id`),
+  KEY (`emp_id`)
+);

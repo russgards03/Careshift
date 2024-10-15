@@ -87,3 +87,12 @@ $(document).ready(function()
     }
     document.oncontextmenu=new Function("alert(message);return false;")
 });
+
+$(document).ready(function() {
+    var message = "This function is not allowed here.";
+
+    $(document).on("contextmenu", function(e) {
+        alert(message);
+        return false; 
+    });
+});
