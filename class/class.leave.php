@@ -31,25 +31,39 @@ class Leave {
     }
     
     
-    public function update_leave_status($leave_id, $status) {
-        $sql = "UPDATE leave SET leave_status=:status WHERE leave_id=:leave_id";
-        $q = $this->conn->prepare($sql);
-        $q->execute(array(':status' => $status, ':leave_id' => $leave_id));
-        return true;
-    }
-
     public function list_leave_applications() {
-        $sql = "SELECT * FROM `leave`";
+        $sql = "
+            SELECT 
+                l.leave_id,
+                e.emp_id,
+                e.emp_lname,
+                e.emp_fname,
+                e.emp_email,
+                e.emp_department,
+                l.leave_type,
+                l.leave_start_date,
+                l.leave_end_date,
+                l.leave_desc,
+                l.leave_status
+            FROM 
+                `leave` l
+            JOIN 
+                employee e ON l.emp_id = e.emp_id"; // Make sure this matches your actual FK relationship
+        
         $q = $this->conn->query($sql) or die("failed!");
+        
+        $data = []; // Initialize the array before using it
         while ($r = $q->fetch(PDO::FETCH_ASSOC)) {
             $data[] = $r;
         }
+        
         if (empty($data)) {
             return false;
         } else {
-            return $data;
+            return $data;    
         }
     }
+    
 
     public function get_leave_id($leave_id) {
         $sql = "SELECT leave_id FROM leave WHERE leave_id = :leave_id";

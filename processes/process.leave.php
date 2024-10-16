@@ -29,7 +29,7 @@ function create_new_leave() {
     $employee_id = $_POST['emp_id'];
     $admin_id = $_POST['adm_id'];
 
-    $leave_status = 'pending';
+    $leave_status = 'Pending';
 
     try {
         $result = $leave->new_leave($leave_type, $start_date, $end_date, $description, $leave_status, $employee_id, $admin_id);
