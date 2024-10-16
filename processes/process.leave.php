@@ -34,7 +34,7 @@ function create_new_leave() {
     try {
         $result = $leave->new_leave($leave_type, $start_date, $end_date, $description, $leave_status, $employee_id, $admin_id);
         if ($result) {
-            header("Location: ../index.php?page=leaves&message=Leave request submitted successfully");
+            header("Location: ../index.php?page=leaves");
             exit();
         }
     } catch (Exception $e) {
