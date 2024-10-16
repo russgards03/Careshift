@@ -42,7 +42,7 @@ $admin_user_login = $admin_id;
                 <li><a href="index.php" class="<?= $page == '' ? 'active' : '' ?>"><i class="fas fa-solid fa-chart-pie"></i>Dashboard</a></li>
                 <li><a href="index.php?page=reports" class="<?= $page == 'reports' ? 'active' : '' ?>"><i class="fas fa-solid fa-file-waveform"></i>Reports</a></li>
                 <li><a href="index.php?page=logs" class="<?= $page == 'logs' ? 'active' : '' ?>"><i class="fas fa-solid fa-receipt"></i>Logs</a></li>
-                <li><a href="index.php?page=leave" class="<?= $page == 'leave' ? 'active' : '' ?>"><i class="fas fa-solid fa-file-pen"></i></i>Leave</a></li>
+                <li><a href="index.php?page=leave" class="<?= $page == 'leave' ? 'active' : '' ?>"><i class="fas fa-regular fa-paste"></i></i></i>Leave Applicants</a></li>
                 <li><a href="index.php?page=schedule" class="<?= $page == 'schedule' ? 'active' : '' ?>"><i class="fas fa-solid fa-clock"></i>Schedule</a></li>
                 <li><a href="index.php?page=employees" class="<?= $page == 'employees' ? 'active' : '' ?>"><i class="fas fa-solid fa-user-nurse"></i>Employees</a></li>
                 <li><a href="index.php?page=admins" class="<?= $page == 'admins' ? 'active' : '' ?>"><i class="fas fa-lock" aria-hidden="true"></i></i>Admins</a></li>

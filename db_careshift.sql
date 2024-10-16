@@ -77,10 +77,14 @@ CREATE TABLE `attendance` (
 DROP TABLE IF EXISTS `leave`;
 CREATE TABLE `leave` (
   `leave_id` int(50) NOT NULL auto_increment,
-  `emp_id` int(50) NOT NULL,
   `leave_type` varchar(50) NOT NULL,
-  `leave_date` date NOT NULL,
+  `leave_start_date` date NOT NULL,
+  `leave_end_date` date NOT NULL,
   `leave_desc` varchar(50) NOT NULL,
+  `leave_status` varchar(50) NOT NULL,
+  `emp_id` int(50) NOT NULL,
+  `adm_id` int(50) NOT NULL,
   PRIMARY KEY  (`leave_id`),
-  KEY (`emp_id`)
+  KEY (`emp_id`),
+  KEY (`adm_id`)
 );

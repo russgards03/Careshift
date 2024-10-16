@@ -1,37 +1,49 @@
+<?php
+require_once 'config/config.php'; 
+require_once 'class/class.leave.php'; 
+require_once 'class/class.admin.php';
+require_once 'class/class.employee.php';
+
+$leave = new Leave; 
+?>
+
 <div class="heading">
-    <h1><i class="fas fa-solid fa-file-pen"></i>&nbspLeave Applicants</h1>
+    <h1><i class="fas fa-regular fa-paste"></i>&nbspLeave Applicants</h1>
+    <a href="index.php?page=leave&subpage=new" class="right_button"><i class="fa fa-file-pen" aria-hidden="true"></i>&nbspApply Leave</a>
 </div>
 
 <table id="tablerecords">   
     <thead>
         <tr>
-            <th>Nurse ID</th>
+            <th>Leave ID</th>
             <th>Applicants</th>
             <th>Department</th>
             <th>Leave Type</th>
+            <th>Leave Status</th>
         </tr>
     </thead>
     <tbody>
         <?php
-        /* Display each admin record located in the database */
-        if ($employee->list_employees() != false) {
-            foreach ($employee->list_employees() as $value) {
-                extract($value);
-                // Create a link for each row using the emp_id
-                $row_url = "index.php?page=employees&subpage=profile&id=" . $emp_id;
+        /* Display each leave application record located in the database */
+        if ($leave->list_leave_applications() != false) {
+            foreach ($leave->list_leave_applications() as $application) {
+                extract($application); // Extract application fields into variables
+                // Create a link for each row using the leave_id
+                $row_url = "index.php?page=leave&subpage=details&id=" . $leave_id; 
                 ?>
                 <tr onclick="location.href='<?php echo $row_url; ?>'" style="cursor: pointer;">
-                    <td><?php echo $emp_id; ?></td>
-                    <td><?php echo $emp_lname . ', ' . $emp_fname . ' ' . $emp_mname; ?></td>
+                    <td><?php echo $leave_id; ?></td>
+                    <td><?php echo $emp_lname . ', ' . $emp_fname; ?></td>
                     <td><?php echo $emp_department; ?></td>
-                    <td>Pregnancy</td>
+                    <td><?php echo $leave_type; ?></td>
+                    <td><?php echo $leave_status; ?></td>
                 </tr>
                 <?php
             }
         } else {
             ?>
             <tr>
-                <td colspan="5">"No Record Found."</td>
+                <td colspan="5">No Record Found.</td>
             </tr>
         <?php
         }
