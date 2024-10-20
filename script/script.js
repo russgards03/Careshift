@@ -1,12 +1,12 @@
 $(document).ready(function() {
-    // FullCalendar initialization
+    // Initialize FullCalendar with all events initially
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next,today',
             center: 'title',
             right: 'month,agendaWeek,agendaDay'
         },
-        selectable: true,   // Allows selecting a day or range of days
+        selectable: true,
         editable: false,
         buttonText: {
             today: 'Today',
@@ -14,31 +14,48 @@ $(document).ready(function() {
             week: 'Week',
             day: 'Day'
         },
-        events: 'schedule-module/fetch_schedule.php', // Fetch events from the database
-
-        // Make individual days clickable
-        //dayClick: function(date, jsEvent, view) {
-            // Redirect or open modal for selected day
-            //alert('Clicked on: ' + date.format());  // You can format the date as needed
-        //},
-
-        // Make events clickable
+        events: 'schedule-module/fetch_schedule.php?nurse_id=all', // Load all events initially
+        eventRender: function(event, element) {
+            element.attr('title', event.title);
+        },
         eventClick: function(event, jsEvent, view) {
-            jsEvent.preventDefault(); // Prevent default behavior
-
-            // Show details in alert or open modal
             var start = event.start.format('YYYY-MM-DD HH:mm');
             var end = event.end ? event.end.format('YYYY-MM-DD HH:mm') : 'N/A';
-            
-            alert('Nurse ID: ' + event.title + '\nStart Time: ' + start + '\nEnd Time: ' + end);
-
+            alert(event.title + '\nStart Time: ' + start + '\nEnd Time: ' + end);
         }
     });
 
+    $('#nurseSelect').on('change', function() {
+        var nurse_id = this.value; // Get the selected nurse ID
+        console.log('Selected Nurse ID:', nurse_id); // Debugging output
+        
+        // Remove all current events from the calendar
+        $('#calendar').fullCalendar('removeEvents');
+
+        // Fetch new events based on the selected nurse
+        $.ajax({
+            url: 'schedule-module/fetch_schedule.php',
+            type: 'GET',
+            data: { nurse_id: nurse_id }
+        })
+        .done(function(events) {
+            // Ensure the response is in JSON format
+            if (Array.isArray(events)) {
+                console.log('Fetched events:', events); // Debugging output
+                $('#calendar').fullCalendar('addEventSource', events);
+            } else {
+                console.error("Unexpected response format:", events);
+            }
+        })
+        .fail(function(xhr, status, error) {
+            console.error("Failed to fetch events: ", error);
+        });
+    });
+});
+
+
 
     // Modal-related code
-
-    // Get the modal, button, and close elements
     var modal = document.getElementById("addScheduleModal");
     var btn = document.getElementById("addScheduleBtn");
     var span = document.getElementsByClassName("close")[0];
@@ -59,40 +76,10 @@ $(document).ready(function() {
             modal.style.display = "none";
         }
     });
-});
 
-$(document).ready(function()
-{ 
-    var message="This function is not allowed here.";
-    function clickIE4(){
-          if (event.button==2){
-              alert(message);
-              return false;
-          }
-    }
-    function clickNS4(e){
-         if (document.layers||document.getElementById&&!document.all){
-                 if (e.which==2||e.which==3){
-                           alert(message);
-                           return false;
-                 }
-         }
-    }
-    if (document.layers){
-          document.captureEvents(Event.MOUSEDOWN);
-          document.onmousedown=clickNS4;
-    }
-    else if (document.all&&!document.getElementById){
-          document.onmousedown=clickIE4;
-    }
-    document.oncontextmenu=new Function("alert(message);return false;")
-});
-
-$(document).ready(function() {
+    // Prevent context menu from appearing
     var message = "This function is not allowed here.";
-
     $(document).on("contextmenu", function(e) {
         alert(message);
         return false; 
     });
-});

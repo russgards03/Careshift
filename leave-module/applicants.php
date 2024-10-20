@@ -1,12 +1,3 @@
-<?php
-require_once 'config/config.php'; 
-require_once 'class/class.leave.php'; 
-require_once 'class/class.admin.php';
-require_once 'class/class.employee.php';
-
-$leave = new Leave; 
-?>
-
 <div class="heading">
     <h1><i class="fas fa-regular fa-paste"></i>&nbspLeave Applicants</h1>
     <a href="index.php?page=leave&subpage=new" class="right_button"><i class="fa fa-file-pen" aria-hidden="true"></i>&nbspApply Leave</a>
@@ -33,8 +24,8 @@ $leave = new Leave;
                 ?>
                 <tr onclick="location.href='<?php echo $row_url; ?>'" style="cursor: pointer;">
                     <td><?php echo $leave_id; ?></td>
-                    <td><?php echo $emp_lname . ', ' . $emp_fname; ?></td>
-                    <td><?php echo $emp_department; ?></td>
+                    <td><?php echo $nurse_lname . ', ' . $nurse_fname; ?></td>
+                    <td><?php echo $nurse_department; ?></td>
                     <td><?php echo $leave_type; ?></td>
                     <td><?php echo $leave_status; ?></td>
                 </tr>

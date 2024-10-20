@@ -26,13 +26,13 @@ function create_new_leave() {
     $start_date = $_POST['leave_start_date'];
     $end_date = $_POST['leave_end_date'];
     $description = $_POST['leave_desc'];
-    $employee_id = $_POST['emp_id'];
+    $nurse_id = $_POST['nurse_id'];
     $admin_id = $_POST['adm_id'];
 
     $leave_status = 'Pending';
 
     try {
-        $result = $leave->new_leave($leave_type, $start_date, $end_date, $description, $leave_status, $employee_id, $admin_id);
+        $result = $leave->new_leave($leave_type, $start_date, $end_date, $description, $leave_status, $nurse_id, $admin_id);
         if ($result) {
             header("Location: ../index.php?page=leaves");
             exit();

@@ -23,7 +23,7 @@
                 <label for="leave_desc">Description:</label>
                 <textarea id="description" name="leave_desc" required></textarea>
 
-                <input type="hidden" id="emp_id" name="emp_id" value="<?php echo $employee_id; ?>"> 
+                <input type="hidden" id="nurse_id" name="nurse_id" value="<?php echo $nurse_id; ?>"> 
 
                 <input type="hidden" id="adm_id" name="adm_id" value="<?php echo $admin_id; ?>"> 
             </div>
