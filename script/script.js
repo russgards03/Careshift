@@ -54,7 +54,6 @@ $(document).ready(function() {
 });
 
 
-
     // Modal-related code
     var modal = document.getElementById("addScheduleModal");
     var btn = document.getElementById("addScheduleBtn");

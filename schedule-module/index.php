@@ -2,23 +2,23 @@
     <div class="heading">
         <h1><i class="fas fa-solid fa-clock"></i>&nbspSchedule</h1>
 
-        <label for="nurseSelect">Select Nurse:</label>
-        <select id="nurseSelect" name="nurse_id">
-            <option value="all">All Nurses</option>
-            <?php
-            // Query to select nurses from the nurse table
-            $query = "SELECT nurse_id, CONCAT(nurse_lname, ', ', nurse_fname) AS name FROM nurse";
-            $result = mysqli_query($con, $query); 
+            <label for="nurseSelect">Select Nurse:</label>
+            <select id="nurseSelect" name="nurse_id">
+                <option value="all">All Nurses</option>
+                <?php
+                // Query to select nurses from the nurse table
+                $query = "SELECT nurse_id, CONCAT(nurse_lname, ', ', nurse_fname) AS name FROM nurse";
+                $result = mysqli_query($con, $query); 
 
-            if ($result && mysqli_num_rows($result) > 0) {
-                while ($row = mysqli_fetch_assoc($result)) {
-                    echo "<option value='{$row['nurse_id']}'>{$row['name']}</option>";
+                if ($result && mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<option value='{$row['nurse_id']}'>{$row['name']}</option>";
+                    }
+                } else {
+                    echo "<option>No nurses found</option>";
                 }
-            } else {
-                echo "<option>No nurses found</option>";
-            }
-            ?>
-        </select>
+                ?>
+            </select>
 
         <!-- Add Schedule Button (opens modal) -->
         <button id="addScheduleBtn" class="right_button">
