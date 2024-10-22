@@ -11,19 +11,38 @@ class Log{
 		$this->conn = new PDO("mysql:host=".$this->DB_SERVER.";dbname=".$this->DB_DATABASE,$this->DB_USERNAME,$this->DB_PASSWORD);
 	}
 
-	/*Function that selects all the records from the logs table */
-	public function list_logs(){
-		$sql="SELECT * FROM logs";
+	public function add_log($actor, $action, $subject, $description) {
+        $sql = "INSERT INTO logs (log_date_managed, log_time_managed, log_actor, log_action, log_subject, log_description) 
+                VALUES (CURRENT_DATE, CURRENT_TIME, :actor, :action, :subject, :description)";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->execute([
+            'actor' => $actor,
+            'action' => $action,
+            'subject' => $subject,
+            'description' => $description,
+        ]);
+    }
+
+	public function list_logs() {
+		$sql = "SELECT logs.*, 
+					   admin.adm_fname, 
+					   admin.adm_lname, 
+					   nurse.nurse_fname, 
+					   nurse.nurse_lname 
+				FROM logs 
+				JOIN admin ON logs.adm_id = admin.adm_id 
+				JOIN nurse ON logs.nurse_id = nurse.nurse_id"; 
+	
 		$q = $this->conn->query($sql) or die("failed!");
-		while($r = $q->fetch(PDO::FETCH_ASSOC)){
-		$data[]=$r;
+		$data = [];
+		
+		while ($r = $q->fetch(PDO::FETCH_ASSOC)) {
+			$data[] = $r;
 		}
-		if(empty($data)){
-		   return false;
-		}else{
-			return $data;	
-		}
+	
+		return empty($data) ? false : $data;
 	}
+	
 	/*Function for getting the log id from the database */
 	function get_log_id($log_id){
 		$sql="SELECT log_id FROM logs WHERE log_id = :log_id";	
