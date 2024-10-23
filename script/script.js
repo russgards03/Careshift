@@ -1,5 +1,13 @@
 $(document).ready(function() {
-    // Initialize FullCalendar with all events initially
+    // Get nurse_id from URL parameters
+    function getNurseIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('nurse_id') || 'all'; // Default to 'all' if not set
+    }
+
+    var nurse_id = getNurseIdFromUrl(); // Fetch nurse_id from URL
+
+    // Initialize FullCalendar with events for the selected nurse
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next,today',
@@ -14,7 +22,7 @@ $(document).ready(function() {
             week: 'Week',
             day: 'Day'
         },
-        events: 'schedule-module/fetch_schedule.php?nurse_id=all', // Load all events initially
+        events: 'schedule-module/fetch_schedule.php?nurse_id=' + nurse_id, // Load events based on nurse_id from the URL
         eventRender: function(event, element) {
             element.attr('title', event.title);
         },
@@ -24,34 +32,43 @@ $(document).ready(function() {
             alert(event.title + '\nStart Time: ' + start + '\nEnd Time: ' + end);
         }
     });
-
-    $('#nurseSelect').on('change', function() {
-        var nurse_id = this.value; // Get the selected nurse ID
-        console.log('Selected Nurse ID:', nurse_id); // Debugging output
-        
-        // Remove all current events from the calendar
-        $('#calendar').fullCalendar('removeEvents');
-
-        // Fetch new events based on the selected nurse
-        $.ajax({
-            url: 'schedule-module/fetch_schedule.php',
-            type: 'GET',
-            data: { nurse_id: nurse_id }
-        })
-        .done(function(events) {
-            // Ensure the response is in JSON format
-            if (Array.isArray(events)) {
-                console.log('Fetched events:', events); // Debugging output
-                $('#calendar').fullCalendar('addEventSource', events);
-            } else {
-                console.error("Unexpected response format:", events);
-            }
-        })
-        .fail(function(xhr, status, error) {
-            console.error("Failed to fetch events: ", error);
-        });
-    });
 });
+
+$(document).ready(function() {
+    function fetchLogs() {
+        $.ajax({
+            url: 'fetch_logs.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                let logRows = '';
+                if (response.length > 0) {
+                    response.forEach(function(log) {
+                        logRows += `<tr>
+                            <td>${log.log_date_managed}</td>
+                            <td>${log.log_time_managed}</td>
+                            <td>${log.adm_fname} ${log.adm_lname}</td>
+                            <td>${log.log_action}</td>
+                            <td>${log.nurse_fname ? log.nurse_fname + ' ' + log.nurse_lname : 'N/A'}</td>
+                            <td>${log.log_description}</td>
+                        </tr>`;
+                    });
+                } else {
+                    logRows = '<tr><td colspan="6">No Record Found.</td></tr>';
+                }
+                $('#tablerecords tbody').html(logRows);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching logs:', error);
+            }
+        });
+    }
+
+    fetchLogs();
+
+    setInterval(fetchLogs, 5000); 
+});
+
 
 
     // Modal-related code

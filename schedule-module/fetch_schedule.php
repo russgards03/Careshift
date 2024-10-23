@@ -1,13 +1,11 @@
 <?php
 include '../config/config.php';
 
-header('Content-Type: application/json');
-
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Get the nurse_id from the AJAX request (default to 'all')
+// Get the nurse_id from the GET request (default to 'all')
 $nurse_id = isset($_GET['nurse_id']) ? $_GET['nurse_id'] : 'all';
 
 // Prepare the base query
