@@ -52,9 +52,6 @@ CREATE TABLE `logs` (
   KEY (`nurse_id`)
 );
 
-INSERT INTO logs(adm_id,nurse_id,log_action,log_description,log_time_managed,log_date_managed) 
-VALUES ("1","3", "Removed", "Lij removed Nurse 24 - Anton Magbanua", '12:34:56', '2024-10-06');
-
 DROP TABLE IF EXISTS `schedule`;
 CREATE TABLE `schedule` (
   `sched_id` int(50) NOT NULL auto_increment,

@@ -35,7 +35,7 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h1><i class="fa fa-plus"></i>&nbspAdd Nurse Schedule</h1>
-        <form method="post" action="schedule-module/generate_schedule.php">
+        <form class="" action="processes/process.schedule.php?action=new" method="POST">
             <label for="nurse_id">Select Nurse:</label>
             <select name="nurse_id" required>
                 <?php
@@ -74,19 +74,4 @@
         </form> 
     </div>
 </div>
-
-<?php
-    $subpage = isset($_GET['subpage']) ? $_GET['subpage'] : 'calendar';
-
-    switch($subpage){
-        case 'add_sched':
-            require_once 'add_schedule.php';
-        break;
-        case 'calendar':
-            require_once 'calendar.php';
-        break; 
-        default:
-            require_once 'calendar.php';
-        break;
-    }
-?>
+<div id="calendar"></div>

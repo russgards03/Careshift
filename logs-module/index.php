@@ -16,15 +16,15 @@
         /* Display each log record from the database */
         if ($logs = $log->list_logs()) {
             foreach ($logs as $value) {
-                extract($value);
+                extract($value); // Extracts variables from the array
                 ?>
                 <tr>
-                    <td><?php echo $log_date_managed; ?></td>
-                    <td><?php echo $log_time_managed; ?></td>
-                    <td><?php echo $adm_fname . ' ' . $adm_lname; ?></td> <!-- Use the first and last name of the admin -->
-                    <td><?php echo $log_action; ?></td>
-                    <td><?php echo isset($nurse_lname) ? $nurse_fname . ' ' . $nurse_lname : 'N/A'; ?></td> 
-                    <td><?php echo $log_description; ?></td>
+                    <td><?php echo htmlspecialchars($log_date_managed); ?></td>
+                    <td><?php echo htmlspecialchars($log_time_managed); ?></td>
+                    <td><?php echo htmlspecialchars($adm_fname . ' ' . $adm_lname); ?></td> <!-- Admin's full name -->
+                    <td><?php echo htmlspecialchars($log_action); ?></td>
+                    <td><?php echo isset($nurse_lname) ? htmlspecialchars($nurse_fname . ' ' . $nurse_lname) : 'N/A'; ?></td> 
+                    <td><?php echo htmlspecialchars($log_description); ?></td>
                 </tr>
                 <?php
             }
