@@ -31,39 +31,19 @@ class Leave {
         return true;
     }
     
-    public function list_leave_applications() {
-        $sql = "
-            SELECT 
-                l.leave_id,
-                n.nurse_id,
-                n.nurse_lname,
-                n.nurse_fname,
-                n.nurse_email,
-                n.nurse_department,
-                l.leave_type,
-                l.leave_start_date,
-                l.leave_end_date,
-                l.leave_desc,
-                l.leave_status
-            FROM 
-                `leave` l
-            JOIN 
-                nurse n ON l.nurse_id = n.nurse_id"; // Make sure this matches your actual FK relationship
-        
-        $q = $this->conn->query($sql) or die("failed!");
-        
-        $data = []; // Initialize the array before using it
-        while ($r = $q->fetch(PDO::FETCH_ASSOC)) {
-            $data[] = $r;
-        }
-        
-        if (empty($data)) {
-            return false;
-        } else {
-            return $data;    
-        }
-    }
-    
+    /*Function that selects all the records from the leaves table */
+	public function list_leaves(){
+		$sql="SELECT * FROM `leave`";
+		$q = $this->conn->query($sql) or die("failed!");
+		while($r = $q->fetch(PDO::FETCH_ASSOC)){
+		$data[]=$r;
+		}
+		if(empty($data)){
+		   return false;
+		}else{
+			return $data;	
+		}
+	}
     public function get_leave_id($leave_id) {
         $sql = "SELECT leave_id FROM `leave` WHERE leave_id = :leave_id"; // Added backticks
         $q = $this->conn->prepare($sql);

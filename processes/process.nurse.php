@@ -26,6 +26,7 @@ function create_new_nurse($con) {
     $middle_name = ucfirst($_POST['middle_name']);
     $last_name = ucfirst($_POST['last_name']);
     $email = $_POST['email'];
+    $sex = $_POST['sex'];
     $contact_no = $_POST['contact_no'];
     $position = $_POST['position'];
     $department = $_POST['department'];
@@ -33,7 +34,7 @@ function create_new_nurse($con) {
     $password = 123;
 
     /* Passes the parameters to the class function */
-    $result = $nurse->new_nurse($password, $first_name, $middle_name, $last_name, $email, $contact_no, $position, $department);
+    $result = $nurse->new_nurse($password, $first_name, $middle_name, $last_name, $email, $sex, $contact_no, $position, $department);
     
     if ($result) {
         $id = $nurse->get_id($first_name);
@@ -65,12 +66,13 @@ function update_nurse(){
     $middle_name = ucfirst($_POST['middle_name']);
     $last_name = ucfirst($_POST['last_name']);
     $email = $_POST['email'];
+    $sex = $_POST['sex'];
     $contact_no = $_POST['contact_no'];
     $position = $_POST['position'];
     $department = $_POST['department'];
 
     /*Passes the parameters to the class function */
-    $result = $nurse->update_nurse($id,$first_name,$middle_name,$last_name,$email,$contact_no,$position,$department);
+    $result = $nurse->update_nurse($id,$first_name,$middle_name,$last_name,$email,$sex,$contact_no,$position,$department);
     if($result){
         header('location: ../index.php?page=nurses&subpage=profile&id=' . $id);
     }

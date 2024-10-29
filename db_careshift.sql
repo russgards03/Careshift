@@ -10,16 +10,12 @@ CREATE TABLE `nurse` (
   `nurse_mname` varchar(50) NOT NULL,
   `nurse_lname` varchar(50) NOT NULL,
   `nurse_email` varchar(50) NOT NULL,
+  `nurse_sex` varchar(50) NOT NULL,
   `nurse_contact` bigint(20) NOT NULL,
   `nurse_position` varchar(255) NOT NULL,
   `nurse_department` varchar(255) NOT NULL,
   PRIMARY KEY  (`nurse_id`)
 );
-
-INSERT INTO nurse(nurse_password,nurse_fname,nurse_mname,nurse_lname,nurse_email,nurse_contact,nurse_position,nurse_department) 
-VALUES ("123", "Romeo", "Valderama", "Seva", "romrom@gmail.com", 123, "Nurse I", "OR"),
-    ("123", "Russ Allen", "Solinap", "Garde", "gards@gmail.com", 123, "Nurse II", "OR"),
-    ("123", "Elijah Zachary", "Geronimo", "Faeldonea", "lij@gmail.com", 123, "Nurse III", "OR");
 
 DROP TABLE IF EXISTS `admin`;
 CREATE TABLE `admin` (
@@ -67,6 +63,7 @@ DROP TABLE IF EXISTS `leave`;
 CREATE TABLE `leave` (
   `leave_id` int(50) NOT NULL auto_increment,
   `leave_type` varchar(50) NOT NULL,
+  `leave_date_filed` date NOT NULL,
   `leave_start_date` date NOT NULL,
   `leave_end_date` date NOT NULL,
   `leave_desc` varchar(50) NOT NULL,
@@ -77,3 +74,8 @@ CREATE TABLE `leave` (
   KEY (`nurse_id`),
   KEY (`adm_id`)
 );
+
+INSERT INTO `leave`(leave_type,leave_date_filed,leave_start_date,leave_end_date,leave_desc,leave_status,nurse_id,adm_id) 
+VALUES  ("Sick Leave", "2024-10-10", "2024-10-20", "2024-10-24", "Diagnosed with amoeba", "Pending", "2", "1"),
+        ("Vacation Leave", "2024-9-2", "2024-9-15", "2024-9-30", "Vacation Break", "Approved", "1", "1"),
+        ("Emergency Leave", "2024-9-2", "2024-9-2", "2024-9-2", "Late", "Denied", "3", "1");

@@ -77,7 +77,12 @@ body{
     justify-content: flex-end;
     gap: 20px;
     align-items: center;
+    position: sticky; /* This makes the header sticky */
+    top: 0;           /* Specifies the top position for the sticky element */
+    z-index: 100;       /* Ensures the header appears above other elements */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds shadow below the header */
 }
+
 
 .wrapper .body .header h3{
     margin: 0;
@@ -117,6 +122,50 @@ body{
 
 .heading .right_button:hover {
     background-color: #27b46b;
+}
+
+.heading #addScheduleBtn {
+    margin: 0px 10px 0px 10px;
+    width: 250px;
+}
+
+.heading #multipleScheduleBtn {
+    margin: 0px 10px 0px 10px;
+    width: 250px;
+}
+
+.heading #generateScheduleBtn {
+    margin: 0px 0px 0px 10px;
+    width: 250px;
+}
+
+#nurseForm label {
+    font-size: 10px;
+}
+
+#nurseForm #nurseSelect {
+    width: 500px;
+}
+
+.right {
+    float: right;
+}
+
+.right .search_bar {
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.search_bar input[type="text"] {
+    padding: 3px;              /* Padding for the input field */
+    width: 250px;              /* Set a fixed width */
+    font-size: 20px;           /* Font size for the input text */
+    border-radius: 4px;       /* Rounded corners for the input */
+    margin-left: 10px;         /* Space between label and input */
+}
+
+.search_bar input[type="text"]:focus {
+    transition: box-shadow 0.3s ease; /* Smooth transition */
 }
 
 #tablerecords{
@@ -160,6 +209,21 @@ body{
 	transition: 0.2s;
 }
 
+.leave-status-denied {
+    background-color: rgb(255, 125, 125);
+}
+
+.leave-status-approved {
+    background-color: rgb(118, 255, 118);
+}
+
+.leave-status-pending {
+    background-color: rgb(248, 246, 137);
+}
+
+
+
+
 .add_form_wrapper{
     display: flex;
     justify-content: center;
@@ -173,6 +237,10 @@ body{
     margin-bottom: 20px;
 }
 
+.profile_image {
+    height: 200px;
+    width: 200px;
+}
 .form_wrapper {
     display: flex;
     justify-content: space-between;
@@ -301,16 +369,89 @@ label {
 	box-shadow: 0 0 10px 5px #CBD4DF;
 }
 
+#nurseForm {
+    display: flex; /* Enable flexbox */
+    justify-content: center; /* Center contents horizontally */
+    gap: 10px; /* Optional: Adds space between elements */
+}
+
+
+#nurseForm label{
+    font-size: 40px;
+}
+
+#nurseForm select{
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 20px;
+}
+
 /* Calendar container */
 #calendar {
-    max-width: 1000px;
-    margin: 40px auto;
+    max-width: 100%;
+    margin: 20px auto;
     padding: 10px;
     background-color: #ffffff; /* Light background */
     border: 1px solid #ddd; /* Border around the calendar */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 0 10px 5px #CBD4DF;
 }
+
+.fc-button {
+    background: #29ce7a !important;
+    border: none !important;
+    color: white !important;
+    padding-bottom: 0px !important;
+    margin: 0px !important;
+}
+
+/* Remove hover styles */
+.fc-button:hover {
+    background: #0f9753 !important;
+    color: white !important;
+}
+
+#calendar .fc-day-today {
+    background-color: #40d4ee !important; /* Ensure it overrides */
+    color: #000 !important; /* Ensure it overrides */
+}
+
+
+/* Remove default text styles */
+.fc h2, .fc h3, .fc h4, .fc h5, .fc h6 {
+    font-size: 40px !important;
+    font-weight: bold !important;
+    color: inherit !important;
+}
+
+/* Reset event styles */
+.fc-event {
+    background: #29ce7a !important;
+    border: black solid 1px !important;
+    color: white !important;
+}
+
+/* Target the header container */
+#calendar .fc-head-container {
+    font-size: 30px !important; /* Desired font size */
+    font-weight: bold !important;
+    color: #000000 !important;
+}
+
+/* Style day numbers */
+#calendar .fc-day-top {
+    font-size: 25px !important; /* Adjust to desired size */
+    color: #000000 !important; /* Change to desired color */
+    font-weight: bold; /* Optional: Change weight */
+}
+
+
+
+
+
+
 
 
 
@@ -339,6 +480,9 @@ label {
     z-index: 1001; /* Ensure modal content is on top of the background */
 }
 
+.modal-content h2 {
+    font-size: 30px;
+}
 
 .modal-content label {
     font-size: 30px;
@@ -347,9 +491,12 @@ label {
 
 
 .modal-content select,
+.modal-content input[type="text"],
 .modal-content input[type="date"],
 .modal-content input[type="time"],
-.modal-content input[type="tel"] {
+.modal-content input[type="tel"],
+.modal-content input[type="number"],
+.modal-content input[type="datetime-local"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
