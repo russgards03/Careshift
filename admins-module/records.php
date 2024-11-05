@@ -3,7 +3,9 @@
     <a href="index.php?page=admins&subpage=add" class="right_button"><i class="fa fa-plus"></i>&nbspAdd Admin</a>
 </div>
 <span class="right">
-    <div class="search_bar">Search:<input type="text" id="search" name="search" onkeyup="">
+    <div class="search_bar">
+        <label for="search">Search:</label>
+        <input type="text" id="search" class="search" name="search" onkeyup="filterTable()">
     </div>
 </span>
 <table id="tablerecords">   
@@ -14,6 +16,7 @@
             <th>Name</th>
             <th>Email</th>
             <th>Contact No.</th>
+            <th>Department</th>
             <th>Access</th>
         </tr>
     </thead>
@@ -32,14 +35,15 @@
                     <td><?php echo $adm_lname . ', ' . $adm_fname . ' ' . $adm_mname; ?></td>
                     <td><?php echo $adm_email; ?></td>
                     <td><?php echo $adm_contact; ?></td>
-                    <td><?php echo $adm_access; ?></td>
+                    <td><?php echo $admin->get_admin_department_name($adm_id); ?></td>
+                    <td><?php echo $admin->get_admin_access_name($adm_id); ?></td>
                 </tr>
                 <?php
             }
         } else {
             ?>
             <tr>
-                <td colspan="6">"No Record Found."</td>
+                <td colspan="7">"No Record Found."</td>
             </tr>
         <?php
         }

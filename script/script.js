@@ -12,7 +12,7 @@ $(document).ready(function() {
         header: {
             left: 'prev,next,today',
             center: 'title',
-            right: 'month,agendaWeek'
+            right: 'month,agendaWeek,list'
         },
         selectable: true,
         editable: false,
@@ -20,7 +20,7 @@ $(document).ready(function() {
             today: 'Today',
             month: 'Month',
             week: 'Week',
-            day: 'Day'
+            list: 'List'
         },
         events: 'schedule-module/fetch_schedule.php?nurse_id=' + nurse_id, // Load events based on nurse_id from the URL
         eventRender: function(event, element) {
@@ -59,34 +59,31 @@ $(document).ready(function() {
     });
 });
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Get references to the "All Nurses" checkbox and individual checkboxes
-    const selectAllNurses = document.getElementById('selectAllNurses');
-    const nurseCheckboxes = document.querySelectorAll('input[name="nurse_id[]"]:not(#selectAllNurses)');
-
-    // Event listener for "All Nurses" checkbox
-    selectAllNurses.addEventListener('change', function() {
-        // Check or uncheck all individual nurse checkboxes based on "All Nurses" checkbox
-        nurseCheckboxes.forEach(function(checkbox) {
-            checkbox.checked = selectAllNurses.checked;
-        });
+$(document).ready(function() {
+    // Initialize FullCalendar
+    $('#calendar').fullCalendar({
+        // Your calendar options here
+        events: [], // Start with no events
+        // Other options...
     });
 
-    // Optional: Add event listeners for individual nurse checkboxes
-    nurseCheckboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function() {
-            // If any individual checkbox is unchecked, uncheck "All Nurses"
-            if (!checkbox.checked) {
-                selectAllNurses.checked = false;
-            }
-            // If all individual checkboxes are checked, check "All Nurses"
-            if (Array.from(nurseCheckboxes).every(checkbox => checkbox.checked)) {
-                selectAllNurses.checked = true;
-            }
-        });
-    });
+    // Function to fetch the schedule
+    window.fetchSchedule = function() {
+        const nurseId = $('#nurseSelect').val();
+
+        // Fetch the schedule based on the selected nurse
+        fetch(`fetch_schedule.php?nurse_id=${nurseId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update FullCalendar with the fetched events
+                $('#calendar').fullCalendar('removeEvents'); // Clear existing events
+                $('#calendar').fullCalendar('addEventSource', data); // Add new events
+            })
+            .catch(error => console.error('Error fetching schedule:', error));
+    };
 });
+
+
 
 
 // Add Schedule Modal
@@ -108,28 +105,6 @@ addScheduleClose.addEventListener("click", function() {
 window.addEventListener("click", function(event) {
     if (event.target == addScheduleModal) {
         addScheduleModal.style.display = "none";
-    }
-});
-
-// Multiple Schedule Modal
-var multipleScheduleModal = document.getElementById("multipleScheduleModal");
-var multipleScheduleBtn = document.getElementById("multipleScheduleBtn");
-var multipleScheduleClose = multipleScheduleModal.getElementsByClassName("close")[0];
-
-// When the user clicks the button, open the modal
-multipleScheduleBtn.addEventListener("click", function() {
-    multipleScheduleModal.style.display = "block";
-});
-
-// When the user clicks on <span> (x), close the modal
-multipleScheduleClose.addEventListener("click", function() {
-    multipleScheduleModal.style.display = "none";
-});
-
-// When the user clicks anywhere outside of the modal, close it
-window.addEventListener("click", function(event) {
-    if (event.target == multipleScheduleModal) {
-        multipleScheduleModal.style.display = "none";
     }
 });
 
@@ -213,3 +188,45 @@ $(document).on("contextmenu", function(e) {
     alert(message);
     return false; 
 });
+
+function filterTable() {
+    let searchInput = document.getElementById("search").value.toUpperCase();
+    let table = document.getElementById("tablerecords");
+    let tr = table.getElementsByTagName("tr");
+    let recordFound = false;
+
+    // Clear previous no record row if it exists
+    let noRecordRow = document.getElementById("no-record-row");
+    if (noRecordRow) {
+        table.deleteRow(noRecordRow.rowIndex);
+    }
+
+    for (let i = 1; i < tr.length; i++) {
+        let tdArray = tr[i].getElementsByTagName("td");
+        let rowMatches = false;
+
+        for (let j = 0; j < tdArray.length; j++) {
+            if (tdArray[j] && tdArray[j].textContent.toUpperCase().includes(searchInput)) {
+                rowMatches = true;
+                break;
+            }
+        }
+
+        tr[i].style.display = rowMatches ? "" : "none";
+        if (rowMatches) {
+            recordFound = true;
+        }
+    }
+
+    // If no records are found, show "No record found"
+    if (!recordFound) {
+        noRecordRow = table.insertRow();
+        noRecordRow.setAttribute("id", "no-record-row");
+        let cell = noRecordRow.insertCell(0);
+        cell.colSpan = 8; // Adjust based on the number of columns
+        cell.textContent = "No record found.";
+        cell.style.textAlign = "center";
+    }
+}
+
+

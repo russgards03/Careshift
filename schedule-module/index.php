@@ -8,36 +8,36 @@
             <i class="fa fa-plus"></i>&nbspAdd Schedule
         </button>
 
-        <!-- Multiple Schedule Button (opens modal) -->
-        <button id="multipleScheduleBtn" class="right_button">
-            <i class="fa fa-plus"></i>&nbspMultiple Assign
-        </button>
+       
 
         <!-- Auto Generate Schedule Button (opens modal) -->
         <button id="generateScheduleBtn" class="right_button">
             <i class="fa fa-plus"></i>&nbspAuto Generate
         </button>
     </div>
-        <form id="nurseForm" method="GET" action="">
-            <label for="nurseSelect">Select Nurse:</label>
-            <select id="nurseSelect" name="nurse_id" onchange="this.form.submit()">
-                <option value="all">All Nurses</option>
-                <?php
-                // Query to select nurses from the nurse table
-                $query = "SELECT nurse_id, CONCAT(nurse_lname, ', ', nurse_fname) AS name FROM nurse";
-                $result = mysqli_query($con, $query);
+    <form id="nurseForm" method="GET">
+        <label for="nurseSelect">Select Nurse:</label>
+        <select id="nurseSelect" name="nurse_id" onchange="fetchSchedule()">
+            <option value="all">All Nurses</option>
+            <?php
+            // Include your database connection here
+            include '../config/config.php';
 
-                if ($result && mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        $selected = isset($_GET['nurse_id']) && $_GET['nurse_id'] == $row['nurse_id'] ? 'selected' : '';
-                        echo "<option value='{$row['nurse_id']}' $selected>{$row['name']}</option>";
-                    }
-                } else {
-                    echo "<option>No nurses found</option>";
+            // Query to select nurses from the nurse table
+            $query = "SELECT nurse_id, CONCAT(nurse_lname, ', ', nurse_fname) AS name FROM nurse";
+            $result = mysqli_query($con, $query);
+
+            if ($result && mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    $selected = isset($_GET['nurse_id']) && $_GET['nurse_id'] == $row['nurse_id'] ? 'selected' : '';
+                    echo "<option value='{$row['nurse_id']}' $selected>{$row['name']}</option>";
                 }
-                ?>
-            </select>
-        </form>
+            } else {
+                echo "<option disabled>No nurses found</option>";
+            }
+            ?>
+        </select>
+    </form>
 </div>
 
 

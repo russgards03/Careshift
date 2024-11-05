@@ -3,7 +3,9 @@
     <a href="index.php?page=nurses&subpage=add" class="right_button"><i class="fa fa-plus"></i>&nbspAdd Nurse</a>
 </div>
 <span class="right">
-    <div class="search_bar">Search:<input type="text" id="search" name="search" onkeyup="">
+    <div class="search_bar">
+        <label for="search">Search:</label>
+        <input type="text" id="search" class="search" name="search" onkeyup="filterTable()">
     </div>
 </span>
 
@@ -15,6 +17,7 @@
             <th>Email</th>
             <th>Contact No.</th>
             <th>Department</th>
+            <th>Position</th>
         </tr>
     </thead>
     <tbody>
@@ -31,14 +34,15 @@
                     <td><?php echo $nurse_lname . ', ' . $nurse_fname . ' ' . $nurse_mname; ?></td>
                     <td><?php echo $nurse_email; ?></td>
                     <td><?php echo $nurse_contact; ?></td>
-                    <td><?php echo $nurse_department; ?></td>
+                    <td><?php echo $nurse->get_nurse_department_name($nurse_id); ?></td>
+                    <td><?php echo $nurse_position; ?></td>
                 </tr>
                 <?php
             }
         } else {
             ?>
             <tr>
-                <td colspan="5">No Record Found.</td>
+                <td colspan="6">No Record Found.</td>
             </tr>
         <?php
         }
