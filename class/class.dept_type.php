@@ -1,4 +1,3 @@
-<!--Department Type Class File-->
 <?php
 class Dept_Type{
 	private $DB_SERVER='localhost';

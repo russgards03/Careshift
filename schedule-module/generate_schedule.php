@@ -26,9 +26,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      VALUES ('$nurse_id', '$sched_date', '$formatted_start_time', '$formatted_end_time')";
 
     if (mysqli_query($con, $insert_query)) {
-        echo "<script>alert('Schedule generated successfully!'); window.location.href = '../index.php?page=schedule&subpage=calendar';</script>";
+        header('Location: ../index.php?page=schedule&subpage=calendar');
+        exit(); // Always call exit after header to stop further code execution
     } else {
-        echo "<script>alert('Error: " . mysqli_error($con) . "'); window.location.href = '../index.php?page=schedule&subpage=calendar';</script>";
+        echo "Error: " . mysqli_error($con);
     }
 }
 

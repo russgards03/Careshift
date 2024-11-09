@@ -1,4 +1,3 @@
-<!--Employee Class File-->
 <?php
 class Employee{
 	private $DB_SERVER='localhost';

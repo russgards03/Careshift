@@ -1,3 +1,5 @@
+// SCHEDULE MODULE-CARESHIFT
+
 $(document).ready(function() {
     // Get nurse_id from URL parameters
     function getNurseIdFromUrl() {
@@ -12,7 +14,7 @@ $(document).ready(function() {
         header: {
             left: 'prev,next,today',
             center: 'title',
-            right: 'month,agendaWeek,list'
+            right: 'month,agendaWeek,agendaDay'
         },
         selectable: true,
         editable: false,
@@ -20,146 +22,182 @@ $(document).ready(function() {
             today: 'Today',
             month: 'Month',
             week: 'Week',
-            list: 'List'
+            day: 'Day'
         },
         events: 'schedule-module/fetch_schedule.php?nurse_id=' + nurse_id, // Load events based on nurse_id from the URL
         eventRender: function(event, element) {
-            element.html(`
-                <div style="white-space: normal;">
-                    <strong>${event.title}</strong><br>
-                    ${event.position}<br>
-                    ${event.department}<br>
-                    ${event.start}<br>
-                    ${event.end}
-                </div>
-            `);
+            element.attr('title', event.title);
         },
         eventClick: function(event, jsEvent, view) {
-            // Populate modal content
-            $('#eventNurse').val(event.title);
-            $('#eventPosition').val(event.position);
-            $('#eventDepartment').val(event.department);
-            $('#eventStart').val(event.start.format('MMMM D, YYYY h:mm A'));
-            $('#eventEnd').val(event.end ? event.end.format('MMMM D, YYYY h:mm A') : 'N/A');
-            
+            // Clear existing values in the modal to avoid showing stale data
+            $('#eventNurse').val('');
+            $('#eventPosition').val('');
+            $('#eventDepartment').val('');
+            $('#eventStart').val('');
+            $('#eventEnd').val('');
+        
+            // Populate modal content with the clicked event's data
+            $('#eventNurse').val(event.title); // Set the nurse's name
+            $('#eventPosition').val(event.position); // Set the nurse's position
+            $('#eventDepartment').val(event.department); // Set the department
+            $('#eventStart').val(event.start.format('MMMM D, YYYY h:mm A')); // Set the start date and time
+            $('#eventEnd').val(event.end ? event.end.format('MMMM D, YYYY h:mm A') : 'N/A'); // Set the end date and time (if available)
+        
             // Show the modal
             $('#viewScheduleModal').css('display', 'block');
         }
     });
+}); // <-- Closing bracket for $(document).ready()
 
-    $('#viewScheduleClose').on('click', function() {
-        $('#viewScheduleModal').css('display', 'none');
-    });
+document.addEventListener("DOMContentLoaded", function() {
+    const departmentSelect = document.getElementById("departmentSelect");
+    const nurseCountElement = document.getElementById("nurse-count");
 
-    // Close the modal when clicking outside the modal content
-    $(window).on('click', function(event) {
-        if ($(event.target).is('#viewScheduleModal')) {
-            $('#viewScheduleModal').css('display', 'none');
-        }
-    });
-});
+    if (departmentSelect) {
+        departmentSelect.addEventListener("change", function() {
+            const departmentId = departmentSelect.value;
 
-$(document).ready(function() {
-    // Initialize FullCalendar
-    $('#calendar').fullCalendar({
-        // Your calendar options here
-        events: [], // Start with no events
-        // Other options...
-    });
+            // Check if the department is "all"
+            if (departmentId !== 'all') {
+                // If a specific department is selected, fetch nurse count for that department
+                fetch('reports-module/fetch_nurse_report.php?department=' + encodeURIComponent(departmentId))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.available_nurses !== undefined) {
+                            nurseCountElement.textContent = data.available_nurses;
+                        } else {
+                            nurseCountElement.textContent = "Error: " + (data.message || "Unknown error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching nurse data:', error);
+                        nurseCountElement.textContent = 'Error fetching data.';
+                    });
+            } else {
+                // If "All Departments" is selected, fetch total nurse count across all departments
+                fetch('reports-module/fetch_nurse_report.php?department=all')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.available_nurses !== undefined) {
+                            nurseCountElement.textContent = data.available_nurses;
+                        } else {
+                            nurseCountElement.textContent = "Error: " + (data.message || "Unknown error");
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching nurse data for all departments:', error);
+                        nurseCountElement.textContent = 'Error fetching data for all departments.';
+                    });
+            }
+        });
+    } else {
+        console.error('Department select element not found.');
+    }
+}); // <-- Closing bracket for document.addEventListener("DOMContentLoaded")
 
-    // Function to fetch the schedule
-    window.fetchSchedule = function() {
-        const nurseId = $('#nurseSelect').val();
+document.addEventListener("DOMContentLoaded", function() {
+    const leaveCountElement = document.getElementById("leave-count");
 
-        // Fetch the schedule based on the selected nurse
-        fetch(`fetch_schedule.php?nurse_id=${nurseId}`)
+    // Function to fetch pending leave data
+    function fetchLeaveReport() {
+        // Fetch the count of pending leaves from fetch_leave_report.php
+        fetch('reports-module/fetch_leave_report.php')
             .then(response => response.json())
             .then(data => {
-                // Update FullCalendar with the fetched events
-                $('#calendar').fullCalendar('removeEvents'); // Clear existing events
-                $('#calendar').fullCalendar('addEventSource', data); // Add new events
+                if (data.pending_leaves !== undefined) {
+                    leaveCountElement.textContent = data.pending_leaves;
+                } else {
+                    leaveCountElement.textContent = "Error: " + (data.message || "Unknown error");
+                }
             })
-            .catch(error => console.error('Error fetching schedule:', error));
-    };
+            .catch(error => {
+                console.error('Error fetching leave data:', error);
+                leaveCountElement.textContent = 'Error fetching leave data.';
+            });
+    }
+
+    // Fetch leave count on page load
+    fetchLeaveReport();
+}); // <-- Closing bracket for document.addEventListener("DOMContentLoaded")
+
+function redirectToSchedulePage() {
+    var nurseId = document.getElementById('nurseSelect').value;
+    if (nurseId) {
+        // Redirect to the schedule page with the selected nurse_id
+        window.location.href = "index.php?page=schedule&subpage=calendar&nurse_id=" + nurseId;
+    }
+} // <-- Closing bracket for redirectToSchedulePage
+
+// Close modal button
+$('#viewScheduleClose').on('click', function () {
+    $('#viewScheduleModal').hide();
 });
 
+// Close the modal when clicking outside the modal content
+$(window).on('click', function (event) {
+    if ($(event.target).is('#viewScheduleModal')) {
+        $('#viewScheduleModal').hide();
+    }
+});
 
-
-
-// Add Schedule Modal
+// Modal behavior for adding schedules
 var addScheduleModal = document.getElementById("addScheduleModal");
 var addScheduleBtn = document.getElementById("addScheduleBtn");
 var addScheduleClose = addScheduleModal.getElementsByClassName("close")[0];
 
-// When the user clicks the button, open the modal
-addScheduleBtn.addEventListener("click", function() {
+addScheduleBtn.addEventListener("click", function () {
     addScheduleModal.style.display = "block";
 });
 
-// When the user clicks on <span> (x), close the modal
-addScheduleClose.addEventListener("click", function() {
+addScheduleClose.addEventListener("click", function () {
     addScheduleModal.style.display = "none";
 });
 
-// When the user clicks anywhere outside of the modal, close it
-window.addEventListener("click", function(event) {
+window.addEventListener("click", function (event) {
     if (event.target == addScheduleModal) {
         addScheduleModal.style.display = "none";
     }
-});
+}); // <-- Closing bracket for window.addEventListener("click")
 
-// Generate Schedule Modal
+$('#generateScheduleForm').submit(function(e) {
+    e.preventDefault(); // Prevent page reload
+    $.ajax({
+        type: 'POST',
+        url: 'schedule-module/generate_schedule.php', // Replace with your PHP script path
+        data: $(this).serialize(),
+        success: function(response) {
+            // Assuming the PHP script returns a success or error message
+            alert('Schedule generated successfully!');
+            // You can update the calendar or do other things here
+            location.reload(); // Optionally reload the page to see changes
+        },
+        error: function() {
+            alert('Error: Could not generate the schedule');
+        }
+    });
+}); // <-- Closing bracket for $('#generateScheduleForm').submit
+
+// Modal behavior for generating schedules
 var generateScheduleModal = document.getElementById("generateScheduleModal");
-var generateScheduleBtn = document.getElementById("generateScheduleBtn"); // Add a button with this ID to trigger the modal
+var generateScheduleBtn = document.getElementById("generateScheduleBtn");
 var generateScheduleClose = generateScheduleModal.getElementsByClassName("close")[0];
 
-// When the user clicks the button, open the modal
-generateScheduleBtn.addEventListener("click", function() {
+generateScheduleBtn.addEventListener("click", function () {
     generateScheduleModal.style.display = "block";
 });
 
-// When the user clicks on <span> (x), close the modal
-generateScheduleClose.addEventListener("click", function() {
+generateScheduleClose.addEventListener("click", function () {
     generateScheduleModal.style.display = "none";
 });
 
-// When the user clicks anywhere outside of the modal, close it
-window.addEventListener("click", function(event) {
+window.addEventListener("click", function (event) {
     if (event.target == generateScheduleModal) {
         generateScheduleModal.style.display = "none";
     }
-});
+}); // <-- Closing bracket for window.addEventListener("click")
 
-// Checkbox behavior for 'Select All Nurses' in generateSchedule
-document.addEventListener('DOMContentLoaded', function() {
-    const selectAllNursesGenerate = document.getElementById('selectAllNursesGenerate');
-    const nurseCheckboxesGenerate = document.querySelectorAll('input[name="nurse_id[]"]:not(#selectAllNursesGenerate)');
-
-    // Event listener for "All Nurses" checkbox
-    selectAllNursesGenerate.addEventListener('change', function() {
-        // Check or uncheck all individual nurse checkboxes based on "All Nurses" checkbox
-        nurseCheckboxesGenerate.forEach(function(checkbox) {
-            checkbox.checked = selectAllNursesGenerate.checked;
-        });
-    });
-
-    // Optional: Add event listeners for individual nurse checkboxes
-    nurseCheckboxesGenerate.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function() {
-            // If any individual checkbox is unchecked, uncheck "All Nurses"
-            if (!checkbox.checked) {
-                selectAllNursesGenerate.checked = false;
-            }
-            // If all individual checkboxes are checked, check "All Nurses"
-            if (Array.from(nurseCheckboxesGenerate).every(checkbox => checkbox.checked)) {
-                selectAllNursesGenerate.checked = true;
-            }
-        });
-    });
-});
-
+// View schedules for a specific nurse
 function viewSchedules(nurse_id) {
-    // Send an AJAX request to fetch schedules for the selected nurse
     fetch('schedule-module/fetch_schedule.php?nurse_id=' + nurse_id)
         .then(response => response.json())
         .then(data => {
@@ -175,19 +213,40 @@ function viewSchedules(nurse_id) {
                            </tr>`;
                 scheduleTable.insertAdjacentHTML('beforeend', row);
             });
-            document.getElementById('scheduleModal').style.display = 'block'; // Show modal
+            document.getElementById('scheduleModal').style.display = 'block';
         });
-}
+} // <-- Closing bracket for viewSchedules
 
 function closeModal() {
     document.getElementById('scheduleModal').style.display = 'none';
-}
+} // <-- Closing bracket for closeModal
 
-var message = "This function is not allowed here.";
+// "Select All Nurses" checkbox functionality
+document.addEventListener('DOMContentLoaded', function () {
+    const selectAllNurses = document.getElementById('selectAllNurses');
+    const nurseCheckboxes = document.querySelectorAll('input[name="nurse_id[]"]:not(#selectAllNurses)');
+
+    selectAllNurses.addEventListener('change', function () {
+        nurseCheckboxes.forEach(function (checkbox) {
+            checkbox.checked = selectAllNurses.checked;
+        });
+    });
+
+    nurseCheckboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            if (!checkbox.checked) {
+                selectAllNurses.checked = false;
+            }
+            if (Array.from(nurseCheckboxes).every(checkbox => checkbox.checked)) {
+                selectAllNurses.checked = true;
+            }
+        });
+    });
+}); // <-- Closing bracket for document.addEventListener('DOMContentLoaded')
+
 $(document).on("contextmenu", function(e) {
-    alert(message);
     return false; 
-});
+}); // <-- Closing bracket for contextmenu event handler
 
 function filterTable() {
     let searchInput = document.getElementById("search").value.toUpperCase();
@@ -227,6 +286,48 @@ function filterTable() {
         cell.textContent = "No record found.";
         cell.style.textAlign = "center";
     }
-}
+} // <-- Closing bracket for filterTable()
 
+function navigateWeek(offset) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('weekOffset', offset);
+    window.location.href = url;
+} // <-- Closing bracket for navigateWeek()
 
+// Global variable to store scanned data
+let scanData = '';
+
+// Function to listen for the keydown event globally
+document.addEventListener('keydown', function(event) {
+    // Get the focused element (if any)
+    const activeElement = document.activeElement;
+
+    // Check if the key pressed is a valid character and if we're not focusing on an input field
+    if (event.key.length === 1) {
+        // If any input field is focused, prevent the character from being typed into that field
+        if (activeElement && (activeElement.tagName.toLowerCase() === 'input' || activeElement.tagName.toLowerCase() === 'textarea')) {
+            event.preventDefault();  // Prevent the scanner input from entering the focused field
+        }
+
+        // Capture the QR code input data
+        scanData += event.key;
+    } 
+    else if (event.key === 'Enter') {
+        // When the scanner sends the "Enter" key, process the scan data
+        try {
+            let data = JSON.parse(scanData);  // Attempt to parse the scan data as JSON
+            if (data.nurse_id) {
+                // Redirect to the page with the nurse_id
+                const nurseId = data.nurse_id;
+                window.location.href = `index.php?page=nurses&subpage=profile&id=${nurseId}`;
+            } else {
+                console.error("nurse_id not found in scanned data");
+            }
+        } catch (e) {
+            console.error("Invalid JSON format", e);
+        } finally {
+            // Clear the scan data after processing
+            scanData = '';
+        }
+    }
+}); // <-- Closing bracket for keydown event listener

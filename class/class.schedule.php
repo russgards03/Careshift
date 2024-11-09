@@ -1,4 +1,3 @@
-<!--Schedule Class File-->
 <?php
 class Schedule{
     private $DB_SERVER='localhost';
@@ -85,7 +84,6 @@ class Schedule{
                 'title' => $nurse_name,
                 'start' => $start_time,
                 'end' => $end_time,
-                'allDay' => false,
             ];
         }
 

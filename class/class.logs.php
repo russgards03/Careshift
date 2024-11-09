@@ -1,4 +1,3 @@
-<!--Logs Class File-->
 <?php
 /*Creates Logs Object with database connection */
 class Log {

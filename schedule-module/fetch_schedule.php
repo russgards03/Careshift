@@ -53,8 +53,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $events[] = [
         'title' => $nurse_name,
-        'position' => htmlspecialchars($row['nurse_position']), // Position
-        'department' => htmlspecialchars($row['department_id']),
         'start' => $start_time,
         'end' => $end_time,
         'allDay' => false,

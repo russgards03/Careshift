@@ -1,4 +1,3 @@
-<!--Admin Class File-->
 <?php
 class Admin{
 	private $DB_SERVER='localhost';

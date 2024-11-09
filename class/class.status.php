@@ -1,4 +1,3 @@
-<!--User Access Class File-->
 <?php
 class Status{
 	private $DB_SERVER='localhost';
