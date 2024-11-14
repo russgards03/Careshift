@@ -1,3 +1,4 @@
+<!--Department Class File-->
 <?php
 class Departments{
 	private $DB_SERVER='localhost';

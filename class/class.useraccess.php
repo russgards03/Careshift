@@ -1,3 +1,4 @@
+<!--User Access Class File-->
 <?php
 class UserAccess{
 	private $DB_SERVER='localhost';

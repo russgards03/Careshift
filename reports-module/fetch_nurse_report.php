@@ -1,24 +1,24 @@
 <?php
-include '../config/config.php';  // Adjust path as necessary
+include '../config/config.php';  
 include '../class/class.nurse.php';
 
 header('Content-Type: application/json');
 
-// Get the selected department (if any)
-$department = isset($_GET['department']) ? $_GET['department'] : '';
+$department = isset($_GET['department']) ? $_GET['department'] : 'all';
 
 $nurse = new Nurse();
 
 if ($department) {
     try {
+        $department = isset($_GET['department']) ? $_GET['department'] : 'all';
         if ($department === 'all') {
-            // If 'all' is selected, count nurses for all departments
-            $nurseCount = $nurse->countTotalNurses(); // Get total nurses from all departments
-            echo json_encode(['available_nurses' => $nurseCount]);
+            $nurseCount = $nurse->countTotalNurses(); 
+            $totalNurses = $nurse->countTotalNurses();
+            echo json_encode(['available_nurses' => $nurseCount, 'total_nurses' => $totalNurses]);
         } else {
-            // If a specific department is selected, count nurses in that department
             $nurseCount = $nurse->countAvailableNursesByDepartment($department);
-            echo json_encode(['available_nurses' => $nurseCount]);
+            $totalNurses = $nurse->countTotalNurses();
+            echo json_encode(['available_nurses' => $nurseCount, 'total_nurses' => $totalNurses]);
         }
     } catch (Exception $e) {
         echo json_encode(['error' => 'Error fetching nurse data: ' . $e->getMessage()]);

@@ -1,5 +1,3 @@
-// SCHEDULE MODULE-CARESHIFT
-
 $(document).ready(function() {
     // Get nurse_id from URL parameters
     function getNurseIdFromUrl() {
@@ -14,7 +12,7 @@ $(document).ready(function() {
         header: {
             left: 'prev,next,today',
             center: 'title',
-            right: 'month,agendaWeek,agendaDay'
+            right: 'month,agendaWeek,list'
         },
         selectable: true,
         editable: false,
@@ -22,32 +20,215 @@ $(document).ready(function() {
             today: 'Today',
             month: 'Month',
             week: 'Week',
-            day: 'Day'
+            list: 'List'
         },
         events: 'schedule-module/fetch_schedule.php?nurse_id=' + nurse_id, // Load events based on nurse_id from the URL
         eventRender: function(event, element) {
             element.attr('title', event.title);
         },
         eventClick: function(event, jsEvent, view) {
-            // Clear existing values in the modal to avoid showing stale data
-            $('#eventNurse').val('');
-            $('#eventPosition').val('');
-            $('#eventDepartment').val('');
-            $('#eventStart').val('');
-            $('#eventEnd').val('');
+            // Populate modal content
+            $('#eventNurse').val(event.title);
+            $('#eventPosition').val(event.position);
+            $('#eventDepartment').val(event.department);
         
-            // Populate modal content with the clicked event's data
-            $('#eventNurse').val(event.title); // Set the nurse's name
-            $('#eventPosition').val(event.position); // Set the nurse's position
-            $('#eventDepartment').val(event.department); // Set the department
-            $('#eventStart').val(event.start.format('MMMM D, YYYY h:mm A')); // Set the start date and time
-            $('#eventEnd').val(event.end ? event.end.format('MMMM D, YYYY h:mm A') : 'N/A'); // Set the end date and time (if available)
+            // Set the sched_id in the hidden input field or display it
+            $('#eventSchedId').val(event.id);  // Display sched_id in modal
+        
+            // Set the nurse_id in the hidden input field or display it
+            $('#eventNurseId').val(event.nurse_id);  // Display nurse_id in modal
+        
+            // Extract date portion (YYYY-MM-DD) and set for eventDate input
+            $('#eventDate').val(event.date);
+            console.log("Event Date:", $('#eventDate').val());  // Debugging output
+        
+            // Extract time portion (HH:mm) and set for eventStartTime and eventEndTime
+            $('#eventStart').val(event.start.format('HH:mm'));
+            $('#eventEnd').val(event.end ? event.end.format('HH:mm') : '');
         
             // Show the modal
             $('#viewScheduleModal').css('display', 'block');
         }
+        
     });
-}); // <-- Closing bracket for $(document).ready()
+
+    $('#viewScheduleClose').on('click', function() {
+        $('#viewScheduleModal').css('display', 'none');
+    });
+
+    // Close the modal when clicking outside the modal content
+    $(window).on('click', function(event) {
+        if ($(event.target).is('#viewScheduleModal')) {
+            $('#viewScheduleModal').css('display', 'none');
+        }
+    });
+});
+
+
+
+$(document).ready(function() {
+    // Initialize FullCalendar
+    $('#calendar').fullCalendar({
+        // Your calendar options here
+        events: [], // Start with no events
+        // Other options...
+    });
+
+    // Function to fetch the schedule
+    window.fetchSchedule = function() {
+        const nurseId = $('#nurseSelect').val();
+
+        // Fetch the schedule based on the selected nurse
+        fetch(`fetch_schedule.php?nurse_id=${nurseId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update FullCalendar with the fetched events
+                $('#calendar').fullCalendar('removeEvents'); // Clear existing events
+                $('#calendar').fullCalendar('addEventSource', data); // Add new events
+            })
+            .catch(error => console.error('Error fetching schedule:', error));
+    };
+});
+
+
+
+
+
+
+
+function viewSchedules(nurse_id) {
+    // Send an AJAX request to fetch schedules for the selected nurse
+    fetch('schedule-module/fetch_schedule.php?nurse_id=' + nurse_id)
+        .then(response => response.json())
+        .then(data => {
+            let scheduleTable = document.querySelector('#scheduleTable tbody');
+            scheduleTable.innerHTML = ''; // Clear previous results
+            data.forEach(schedule => {
+                let row = `<tr>
+                               <td>${schedule.sched_id}</td>
+                               <td>${schedule.start_date}</td>
+                               <td>${schedule.end_date}</td>
+                               <td>${schedule.start_time}</td>
+                               <td>${schedule.end_time}</td>
+                           </tr>`;
+                scheduleTable.insertAdjacentHTML('beforeend', row);
+            });
+            document.getElementById('scheduleModal').style.display = 'block'; // Show modal
+        });
+}
+
+
+function closeModal() {
+    document.getElementById('scheduleModal').style.display = 'none';
+}
+
+
+
+function filterTable() {
+    let searchInput = document.getElementById("search").value.toUpperCase();
+    let table = document.getElementById("tablerecords");
+    let tr = table.getElementsByTagName("tr");
+    let recordFound = false;
+
+    // Clear previous no record row if it exists
+    let noRecordRow = document.getElementById("no-record-row");
+    if (noRecordRow) {
+        table.deleteRow(noRecordRow.rowIndex);
+    }
+
+    for (let i = 1; i < tr.length; i++) {
+        let tdArray = tr[i].getElementsByTagName("td");
+        let rowMatches = false;
+
+        for (let j = 0; j < tdArray.length; j++) {
+            if (tdArray[j] && tdArray[j].textContent.toUpperCase().includes(searchInput)) {
+                rowMatches = true;
+                break;
+            }
+        }
+
+        tr[i].style.display = rowMatches ? "" : "none";
+        if (rowMatches) {
+            recordFound = true;
+        }
+    }
+
+    // If no records are found, show "No record found"
+    if (!recordFound) {
+        noRecordRow = table.insertRow();
+        noRecordRow.setAttribute("id", "no-record-row");
+        let cell = noRecordRow.insertCell(0);
+        cell.colSpan = 8; // Adjust based on the number of columns
+        cell.textContent = "No record found.";
+        cell.style.textAlign = "center";
+    }
+}
+
+function navigateWeek(offset) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('weekOffset', offset);
+    window.location.href = url;
+}
+
+
+
+
+
+let scanData = '';  // To accumulate QR code scan data
+let manualTyping = false;  // Track if you are manually typing in an input
+
+// Listen for the focus event on input fields to stop scanner input
+document.querySelectorAll('input, textarea').forEach((element) => {
+    element.addEventListener('focus', function() {
+        manualTyping = true;  // User is typing, so disable scanner input
+    });
+
+    element.addEventListener('blur', function() {
+        manualTyping = false; // Input has lost focus, enable scanner input
+    });
+});
+
+// Function to listen for the keydown event globally
+document.addEventListener('keydown', function(event) {
+    // Check if we should ignore the scanner input (when typing in a text field)
+    if (manualTyping) return;  // Ignore scanner input while typing
+
+    // If not typing and scanner input is detected (i.e., a key is pressed)
+    if (event.key.length === 1) {
+        scanData += event.key; // Accumulate the scanned characters
+    }
+
+    // If the Enter key is pressed, process the scanned data
+    if (event.key === 'Enter' && scanData) {
+        event.preventDefault();  // Prevent the default action of the Enter key
+        processScanData();       // Process the accumulated scan data
+    }
+});
+
+// Function to process the scanned QR code data
+function processScanData() {
+    try {
+        let data = JSON.parse(scanData);  // Attempt to parse the scanned data as JSON
+        if (data.nurse_id) {
+            // If nurse_id exists, redirect to the relevant profile page
+            const nurseId = data.nurse_id;
+            window.location.href = `index.php?page=nurses&subpage=profile&id=${nurseId}`;
+        } else {
+            console.error("nurse_id not found in scanned data");
+        }
+    } catch (e) {
+        console.error("Invalid JSON format", e);  // Handle invalid scan data format
+    }
+    scanData = '';  // Clear scan data after processing
+}
+
+
+
+
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", function() {
     const departmentSelect = document.getElementById("departmentSelect");
@@ -118,216 +299,191 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // Fetch leave count on page load
     fetchLeaveReport();
-}); // <-- Closing bracket for document.addEventListener("DOMContentLoaded")
+}); // <-- Closing bracket for do
 
-function redirectToSchedulePage() {
-    var nurseId = document.getElementById('nurseSelect').value;
-    if (nurseId) {
-        // Redirect to the schedule page with the selected nurse_id
-        window.location.href = "index.php?page=schedule&subpage=calendar&nurse_id=" + nurseId;
+
+
+
+
+
+
+
+function toggleDropdown() {
+    const dropdown = document.getElementById("dropdownOptions");
+    dropdown.style.display = dropdown.style.display === "none" || dropdown.style.display === "" ? "block" : "none";
+}
+
+// Optional: Close the dropdown if the user clicks outside of it
+document.addEventListener("click", function (event) {
+    const dropdown = document.getElementById("dropdownOptions");
+    const input = document.getElementById("nurseDropdown");
+    if (!input.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.style.display = "none";
     }
-} // <-- Closing bracket for redirectToSchedulePage
-
-// Close modal button
-$('#viewScheduleClose').on('click', function () {
-    $('#viewScheduleModal').hide();
 });
 
-// Close the modal when clicking outside the modal content
-$(window).on('click', function (event) {
-    if ($(event.target).is('#viewScheduleModal')) {
-        $('#viewScheduleModal').hide();
-    }
-});
 
-// Modal behavior for adding schedules
-var addScheduleModal = document.getElementById("addScheduleModal");
-var addScheduleBtn = document.getElementById("addScheduleBtn");
-var addScheduleClose = addScheduleModal.getElementsByClassName("close")[0];
 
-addScheduleBtn.addEventListener("click", function () {
-    addScheduleModal.style.display = "block";
-});
-
-addScheduleClose.addEventListener("click", function () {
-    addScheduleModal.style.display = "none";
-});
-
-window.addEventListener("click", function (event) {
-    if (event.target == addScheduleModal) {
-        addScheduleModal.style.display = "none";
-    }
-}); // <-- Closing bracket for window.addEventListener("click")
-
-$('#generateScheduleForm').submit(function(e) {
-    e.preventDefault(); // Prevent page reload
-    $.ajax({
-        type: 'POST',
-        url: 'schedule-module/generate_schedule.php', // Replace with your PHP script path
-        data: $(this).serialize(),
-        success: function(response) {
-            // Assuming the PHP script returns a success or error message
-            alert('Schedule generated successfully!');
-            // You can update the calendar or do other things here
-            location.reload(); // Optionally reload the page to see changes
-        },
-        error: function() {
-            alert('Error: Could not generate the schedule');
-        }
-    });
-}); // <-- Closing bracket for $('#generateScheduleForm').submit
-
-// Modal behavior for generating schedules
-var generateScheduleModal = document.getElementById("generateScheduleModal");
-var generateScheduleBtn = document.getElementById("generateScheduleBtn");
-var generateScheduleClose = generateScheduleModal.getElementsByClassName("close")[0];
-
-generateScheduleBtn.addEventListener("click", function () {
-    generateScheduleModal.style.display = "block";
-});
-
-generateScheduleClose.addEventListener("click", function () {
-    generateScheduleModal.style.display = "none";
-});
-
-window.addEventListener("click", function (event) {
-    if (event.target == generateScheduleModal) {
-        generateScheduleModal.style.display = "none";
-    }
-}); // <-- Closing bracket for window.addEventListener("click")
-
-// View schedules for a specific nurse
-function viewSchedules(nurse_id) {
-    fetch('schedule-module/fetch_schedule.php?nurse_id=' + nurse_id)
-        .then(response => response.json())
-        .then(data => {
-            let scheduleTable = document.querySelector('#scheduleTable tbody');
-            scheduleTable.innerHTML = ''; // Clear previous results
-            data.forEach(schedule => {
-                let row = `<tr>
-                               <td>${schedule.sched_id}</td>
-                               <td>${schedule.start_date}</td>
-                               <td>${schedule.end_date}</td>
-                               <td>${schedule.start_time}</td>
-                               <td>${schedule.end_time}</td>
-                           </tr>`;
-                scheduleTable.insertAdjacentHTML('beforeend', row);
-            });
-            document.getElementById('scheduleModal').style.display = 'block';
-        });
-} // <-- Closing bracket for viewSchedules
-
-function closeModal() {
-    document.getElementById('scheduleModal').style.display = 'none';
-} // <-- Closing bracket for closeModal
-
-// "Select All Nurses" checkbox functionality
-document.addEventListener('DOMContentLoaded', function () {
-    const selectAllNurses = document.getElementById('selectAllNurses');
-    const nurseCheckboxes = document.querySelectorAll('input[name="nurse_id[]"]:not(#selectAllNurses)');
-
-    selectAllNurses.addEventListener('change', function () {
-        nurseCheckboxes.forEach(function (checkbox) {
-            checkbox.checked = selectAllNurses.checked;
-        });
+function toggleSelectAll() {
+    const isChecked = document.getElementById('selectAll').checked;
+    document.querySelectorAll('.nurse-option').forEach(function(checkbox) {
+        checkbox.checked = isChecked;  // Set the checked status for all checkboxes
     });
 
-    nurseCheckboxes.forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
-            if (!checkbox.checked) {
-                selectAllNurses.checked = false;
-            }
-            if (Array.from(nurseCheckboxes).every(checkbox => checkbox.checked)) {
-                selectAllNurses.checked = true;
-            }
-        });
-    });
-}); // <-- Closing bracket for document.addEventListener('DOMContentLoaded')
+    // Call the update function to update the hidden input and dropdown
+    updateSelectedNurses();
+}
 
+function updateSelectedNurses() {
+    let selectedNurses = [];
+    let selectedNursesNames = [];
+
+    document.querySelectorAll('.nurse-option:checked').forEach(function(checkbox) {
+        selectedNurses.push(checkbox.value);
+        selectedNursesNames.push(checkbox.nextSibling.textContent.trim());
+    });
+
+    // Update the value of the hidden input field
+    document.getElementById('nurse_id').value = selectedNurses.join(',');
+    
+    // Update the text input field with selected nurse names
+    document.getElementById('nurseDropdown').value = selectedNursesNames.join(', ');
+
+    // Update the "Select All" checkbox based on the selection
+    const allSelected = document.querySelectorAll('.nurse-option').length === selectedNurses.length;
+    document.getElementById('selectAll').checked = allSelected;
+}
+
+// DISABLE RIGHT CLICK
 $(document).on("contextmenu", function(e) {
     return false; 
-}); // <-- Closing bracket for contextmenu event handler
+});
 
-function filterTable() {
-    let searchInput = document.getElementById("search").value.toUpperCase();
-    let table = document.getElementById("tablerecords");
-    let tr = table.getElementsByTagName("tr");
-    let recordFound = false;
 
-    // Clear previous no record row if it exists
-    let noRecordRow = document.getElementById("no-record-row");
-    if (noRecordRow) {
-        table.deleteRow(noRecordRow.rowIndex);
-    }
+// REPORTS
+document.addEventListener("DOMContentLoaded", function() {
+    const departmentSelect = document.getElementById("departmentSelect");
+    const nurseCountElement = document.getElementById("nurse-count");
 
-    for (let i = 1; i < tr.length; i++) {
-        let tdArray = tr[i].getElementsByTagName("td");
-        let rowMatches = false;
-
-        for (let j = 0; j < tdArray.length; j++) {
-            if (tdArray[j] && tdArray[j].textContent.toUpperCase().includes(searchInput)) {
-                rowMatches = true;
-                break;
+    const ctx = document.getElementById('nurseChart').getContext('2d');
+    let nurseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Total Nurses', 'Available Nurses'],
+            datasets: [{
+                label: 'Nurse Count',
+                data: [0, 0],
+                backgroundColor: ['rgba(54, 162, 235, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+                borderColor: ['rgba(54, 162, 235, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true, 
+                    min: 0,
+                    max: 20
+                }
             }
         }
+    });
 
-        tr[i].style.display = rowMatches ? "" : "none";
-        if (rowMatches) {
-            recordFound = true;
-        }
-    }
-
-    // If no records are found, show "No record found"
-    if (!recordFound) {
-        noRecordRow = table.insertRow();
-        noRecordRow.setAttribute("id", "no-record-row");
-        let cell = noRecordRow.insertCell(0);
-        cell.colSpan = 8; // Adjust based on the number of columns
-        cell.textContent = "No record found.";
-        cell.style.textAlign = "center";
-    }
-} // <-- Closing bracket for filterTable()
-
-function navigateWeek(offset) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('weekOffset', offset);
-    window.location.href = url;
-} // <-- Closing bracket for navigateWeek()
-
-// Global variable to store scanned data
-let scanData = '';
-
-// Function to listen for the keydown event globally
-document.addEventListener('keydown', function(event) {
-    // Get the focused element (if any)
-    const activeElement = document.activeElement;
-
-    // Check if the key pressed is a valid character and if we're not focusing on an input field
-    if (event.key.length === 1) {
-        // If any input field is focused, prevent the character from being typed into that field
-        if (activeElement && (activeElement.tagName.toLowerCase() === 'input' || activeElement.tagName.toLowerCase() === 'textarea')) {
-            event.preventDefault();  // Prevent the scanner input from entering the focused field
+     if (departmentSelect) {
+        if (!departmentSelect.value) {
+            departmentSelect.value = 'all';
         }
 
-        // Capture the QR code input data
-        scanData += event.key;
-    } 
-    else if (event.key === 'Enter') {
-        // When the scanner sends the "Enter" key, process the scan data
-        try {
-            let data = JSON.parse(scanData);  // Attempt to parse the scan data as JSON
-            if (data.nurse_id) {
-                // Redirect to the page with the nurse_id
-                const nurseId = data.nurse_id;
-                window.location.href = `index.php?page=nurses&subpage=profile&id=${nurseId}`;
-            } else {
-                console.error("nurse_id not found in scanned data");
+        const departmentId = departmentSelect.value;
+        fetchNurseData(departmentId);
+
+        departmentSelect.addEventListener("change", function() {
+            const departmentId = departmentSelect.value;
+            fetchNurseData(departmentId);
+        });
+
+        function fetchNurseData(departmentId) {
+            fetch('reports-module/fetch_nurse_report.php?department=' + encodeURIComponent(departmentId))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.available_nurses !== undefined && data.total_nurses !== undefined) {
+                        nurseCountElement.textContent = data.available_nurses;
+                        nurseChart.data.datasets[0].data = [data.total_nurses, data.available_nurses];
+                        nurseChart.update();
+                    } else {
+                        nurseCountElement.textContent = "Error: " + (data.message || "Unknown error");
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching nurse data:', error);
+                    nurseCountElement.textContent = 'Error fetching data.';
+                });
+        }
+    } else {
+        console.error('Department select element not found.');
+    }
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    const departmentSelectLeave = document.getElementById("departmentSelectLeave");
+    const leaveCountElement = document.getElementById("leave-count");
+
+    const ctx = document.getElementById('leaveChart').getContext('2d');
+    let leaveChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Pending Leaves'],
+            datasets: [{
+                label: 'Pending Leaves Count',
+                data: [0], 
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    min: 0,
+                    max: 20
+                }
             }
-        } catch (e) {
-            console.error("Invalid JSON format", e);
-        } finally {
-            // Clear the scan data after processing
-            scanData = '';
         }
+    });
+
+    function fetchPendingLeaves(department = 'all') {
+        const url = `reports-module/fetch_leave_report.php?department=${encodeURIComponent(department)}`;
+        
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.pending_leaves !== undefined) {
+                    leaveCountElement.textContent = data.pending_leaves;
+
+                    leaveChart.data.datasets[0].data = [data.pending_leaves];
+                    leaveChart.update();
+                } else {
+                    leaveCountElement.textContent = "Error: " + (data.message || "Unknown error");
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching leave data:', error);
+                leaveCountElement.textContent = 'Error fetching leave data.';
+            });
     }
-}); // <-- Closing bracket for keydown event listener
+
+    // Set default department to 'all' if no department is selected
+    const initialDepartment = departmentSelectLeave ? departmentSelectLeave.value : 'all';
+    fetchPendingLeaves(initialDepartment); // Fetch initial data
+
+    // Add event listener to department selection dropdown
+    if (departmentSelectLeave) {
+        departmentSelectLeave.addEventListener("change", function() {
+            const selectedDepartment = departmentSelectLeave.value;
+            fetchPendingLeaves(selectedDepartment); // Fetch new data when department is changed
+        });
+    }
+});

@@ -580,18 +580,65 @@ label {
     cursor: pointer;
 }
 
-.schedule-table {
+#qr-reader {
+    width: 500px;
+    height: 500px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+}
+#result {
+    margin-top: 20px;
+    font-size: 1.2em;
+}
+
+
+
+
+
+.custom-multiselect {
+    position: relative;
+    display: inline-block;
+    width: 100%; /* Adjust width as needed */
+}
+
+.custom-multiselect input[type="text"] {
     width: 100%;
-    border-collapse: collapse;
+    padding: 10px;
+    cursor: pointer;
 }
 
-.schedule-table th, .schedule-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+.dropdown-options {
+    display: block; /* Initially hide the dropdown */
+    background-color: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1;
+    width: 100%;
 }
 
-.schedule-table th {
-    background-color: #f2f2f2;
-    font-weight: bold;
+.dropdown-options label {
+    display: block;
+    padding: 5px 10px;
+}
+
+.dropdown-options label:hover {
+    background-color: #f0f0f0;
+}
+
+
+
+
+
+
+
+.charts-container {
+    display: flex;
+    justify-content: space-between; 
+    gap: 20px; 
+}
+
+canvas {
+    max-width: 50%;
+    max-height: 100%;
 }
