@@ -1,14 +1,13 @@
 <?php
-/*Include Admin Class File */
+include '../config/config.php';
 include '../class/class.admin.php';
+include '../class/class.logs.php';
 
-/*Parameters for switch case*/
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-/*Switch case for actions in the process */
 switch($action){
 	case 'new':
-        create_new_admin();
+        create_new_admin($con);
 	break;
     case 'update':
         update_admin();
@@ -18,10 +17,10 @@ switch($action){
     break;
 }
 
-/*Main Function Process for creating an admin */
-function create_new_admin(){
+function create_new_admin($con){
     $admin = new Admin();
-    /*Receives the parameters passed from the creation page form */
+    $log = new Log();
+
     $username = $_POST['username'];
     $first_name = ucfirst($_POST['first_name']);
     $middle_name = ucfirst($_POST['middle_name']);
@@ -30,21 +29,29 @@ function create_new_admin(){
     $contact_no = $_POST['contact_no'];
     $department = $_POST['department'];
     $access = $_POST['access'];
-
     $password = 123;
 
-    /*Passes the parameters to the class function */
     $result = $admin->new_admin($username,$password,$first_name,$middle_name,$last_name,$email,$contact_no,$access,$department);
-    if($result){
-        $id = $admin->get_id_by_username($username);
+
+    if ($result) {
+        $id = $admin->get_last_inserted_admin_id();;
+
+        $log_action = "Created New Admin";
+        $log_description = "Created a new admin account for $first_name $last_name";
+        $adm_id = $_SESSION['adm_id']; 
+
+        $log->addLog($log_action, $log_description, $adm_id, $id);
+
         header("location: ../index.php?page=admins");
+    } else {
+        echo "<script>alert('Error creating new admin.'); window.history.back();</script>";
     }
 }
 
-/*Main Function Process for updating an admin */
 function update_admin(){  
     $admin = new Admin();
-    /*Receives the parameters passed from the profile updating page form */
+    $log = new Log();
+
     $id = $_POST['id'];
     $username = $_POST['username'];
     $first_name = ucfirst($_POST['first_name']);
@@ -54,36 +61,49 @@ function update_admin(){
     $contact_no = $_POST['contact_no'];
     $access = $_POST['access'];
 
-    /*Passes the parameters to the class function */
     $result = $admin->update_admin($id,$username,$first_name,$middle_name,$last_name,$email,$contact_no,$access);
+
     if($result){
+
+        $admin_info = $admin->get_admin_by_id($id);
+        $log_action = "Update Admin";
+        $log_description = "Updated admin account for $first_name $last_name (Username: $username)";
+        $adm_id = $_SESSION['adm_id']; 
+
+        $log->addLog($log_action, $log_description, $adm_id, $id);
         header('location: ../index.php?page=admins&subpage=profile&id=' . $id);
+    } else {
+        echo "<script>alert('Error updating admin.'); window.history.back();</script>";
     }
 }
 
-/*Main Function Process for deleting a nurse */
 function delete_admin()
 {
-    /*If parameter was passed succesfully */
     if (isset($_POST['id'])) {
         $admin = new Admin();
-        /*Receives the parameters passed from the delete button */
+        $log = new Log();
+
         $id = $_POST['id'];
 
-        /*Passes the parameters to the class function */
+        $admin_info = $admin->get_admin_by_id($id);
+        $first_name = $admin_info['adm_fname'];
+        $last_name = $admin_info['adm_lname'];
+        $username = $admin_info['adm_username'];
+
         $result = $admin->delete_admin($id);
 
-        /*If result was executed */
         if ($result) {
+            $log_action = "Delete Admin";
+            $log_description = "Deleted admin account for $first_name $last_name";
+            $adm_id = $_SESSION['adm_id'];
+
+            $log->addLog($log_action, $log_description, $adm_id, $id);
+
             header("location: ../index.php?page=admins&subpage=records");
-        }
-        /*If result was interrupted */
-        else {
+        } else {
             echo "Error deleting admin.";
         }
-    }
-    /*If parameter was not passed successfully */
-    else {
+    } else {
         echo "Invalid Admin ID.";
     }
 }

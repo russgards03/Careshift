@@ -72,6 +72,10 @@ class Admin{
 			return $data;	
 		}
 	}
+	public function get_last_inserted_admin_id() {
+        // Return the last inserted ID using lastInsertId()
+        return $this->conn->lastInsertId();
+    }
 	/*Function for getting the admin id from the database */
 	function get_id_by_id($id){
 		$sql="SELECT adm_id FROM admin WHERE adm_id = :id";	
@@ -79,6 +83,12 @@ class Admin{
 		$q->execute(['id' => $id]);
 		$id = $q->fetchColumn();
 		return $id;
+	}
+	function get_admin_by_id($id) {
+		$sql = "SELECT adm_fname, adm_lname, adm_username FROM admin WHERE adm_id = :id";
+		$q = $this->conn->prepare($sql);
+		$q->execute(['id' => $id]);
+		return $q->fetch(PDO::FETCH_ASSOC);
 	}
 	/*Function for getting the admin id by username from the database */
 	function get_id_by_username($username){
@@ -176,10 +186,6 @@ class Admin{
 		$department_name = $q->fetchColumn();
 		return $department_name;
 	}
-
-
-
-
 
     /*Function for getting the session from the database for logging in */
 	function get_session(){

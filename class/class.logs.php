@@ -23,7 +23,7 @@ class Log {
         $stmt->bindParam(':description', $description);
         $stmt->bindParam(':log_time', $log_time);
         $stmt->bindParam(':log_date', $log_date);
-        $stmt->bindParam(':adm_id', $adm_id);
+        $stmt->bindParam(':adm_id', $adm_id, );
         $stmt->bindParam(':nurse_id', $nurse_id, PDO::PARAM_INT);
 
         return $stmt->execute();
