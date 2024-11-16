@@ -46,8 +46,6 @@ CREATE TABLE `logs` (
   `log_date_managed` date NOT NULL,
   `adm_id` int(50) NOT NULL,
   `nurse_id` int(50) NOT NULL,
-  `actor_id` int(50) NOT NULL,
-  `subject_id` int(50) NOT NULL,
   PRIMARY KEY  (`log_id`),
   KEY (`adm_id`),
   KEY (`nurse_id`)
