@@ -31,16 +31,16 @@ function create_new_admin($con){
     $access = $_POST['access'];
     $password = 123;
 
-    $result = $admin->new_admin($username,$password,$first_name,$middle_name,$last_name,$email,$contact_no,$access,$department);
+    $result = $admin->new_admin($username, $password, $first_name, $middle_name, $last_name, $email, $contact_no, $access, $department);
 
     if ($result) {
-        $id = $admin->get_last_inserted_admin_id();;
+        $id = $admin->get_id_by_username($username);
 
         $log_action = "Created New Admin";
-        $log_description = "Created a new admin account for $first_name $last_name";
+        $log_description = "Created Admin: $last_name, $first_name (Admin ID: $id)";
         $adm_id = $_SESSION['adm_id']; 
 
-        $log->addLog($log_action, $log_description, $adm_id, $id);
+        $log->addLog($log_action, $log_description, $adm_id);
 
         header("location: ../index.php?page=admins");
     } else {
@@ -59,15 +59,15 @@ function update_admin(){
     $last_name = ucfirst($_POST['last_name']);
     $email = $_POST['email'];
     $contact_no = $_POST['contact_no'];
+    $department = $_POST['department'];
     $access = $_POST['access'];
 
-    $result = $admin->update_admin($id,$username,$first_name,$middle_name,$last_name,$email,$contact_no,$access);
+    $result = $admin->update_admin($id,$username,$first_name,$middle_name,$last_name,$email,$contact_no,$access,$department);
 
     if($result){
 
-        $admin_info = $admin->get_admin_by_id($id);
-        $log_action = "Update Admin";
-        $log_description = "Updated admin account for $first_name $last_name (Username: $username)";
+        $log_action = "Updated Admin";
+        $log_description = "Updated Details for  $last_name, $first_name (Admin ID: $id)";
         $adm_id = $_SESSION['adm_id']; 
 
         $log->addLog($log_action, $log_description, $adm_id, $id);
@@ -82,29 +82,25 @@ function delete_admin()
     if (isset($_POST['id'])) {
         $admin = new Admin();
         $log = new Log();
-
         $id = $_POST['id'];
 
-        $admin_info = $admin->get_admin_by_id($id);
-        $first_name = $admin_info['adm_fname'];
-        $last_name = $admin_info['adm_lname'];
-        $username = $admin_info['adm_username'];
+        $first_name = $admin->get_fname($id);
+        $last_name = $admin->get_lname($id);
 
         $result = $admin->delete_admin($id);
 
         if ($result) {
             $log_action = "Delete Admin";
-            $log_description = "Deleted admin account for $first_name $last_name";
+            $log_description = "Deleted Admin: $last_name $first_name (Admin ID: $id)";
             $adm_id = $_SESSION['adm_id'];
 
             $log->addLog($log_action, $log_description, $adm_id, $id);
-
             header("location: ../index.php?page=admins&subpage=records");
         } else {
             echo "Error deleting admin.";
         }
     } else {
-        echo "Invalid Admin ID.";
+        echo "Admin not found.";
     }
 }
 ?>

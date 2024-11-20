@@ -29,10 +29,12 @@ function create_new_department($con) {
 
     if ($result) {
         $id = $department->get_id_by_department_name($department_name);
-        $log_action = "Create Department";
-        $log_description = "Created a new department: $department_name";
+
+        $log_action = "Create New Department";
+        $log_description = "Created Department: $department_name (Dept. ID: $id)";
         $adm_id = $_SESSION['adm_id'];
-        $log->addLog($log_action, $log_description, $adm_id, $id);
+
+        $log->addLog($log_action, $log_description, $adm_id);
 
         header("location: ../index.php?page=departments");
     } else {
@@ -53,10 +55,10 @@ function update_department(){
 
     if ($result) {
         $log_action = "Update Department";
-        $log_description = "Updated department: $department_name";
+        $log_description = "Updated Details for $department_name (Dept. ID: $id)";
         $adm_id = $_SESSION['adm_id'];
-        $log->addLog($log_action, $log_description, $adm_id, $id);
 
+        $log->addLog($log_action, $log_description, $adm_id, $id);
         header('location: ../index.php?page=departments&subpage=profile&id=' . $id);
     }
 }
@@ -65,13 +67,15 @@ function delete_department() {
     if (isset($_POST['id'])) {
         $department = new Departments();
         $log = new Log();
-
         $id = $_POST['id'];
+
+        $department_name = $department->get_department_name($id);
+
         $result = $department->delete_department($id);
 
         if ($result) {
             $log_action = "Delete Department";
-            $log_description = "Deleted department with ID: $id";
+            $log_description = "Deleted Department: $department_name (Dept. ID: $id)";
             $adm_id = $_SESSION['adm_id'];
             $log->addLog($log_action, $log_description, $adm_id, $id);
 
@@ -80,7 +84,7 @@ function delete_department() {
             echo "Error deleting department.";
         }
     } else {
-        echo "Invalid Department ID.";
+        echo "Department not found.";
     }
 }
 ?>

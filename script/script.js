@@ -174,53 +174,61 @@ function navigateWeek(offset) {
 
 
 
-let scanData = '';  // To accumulate QR code scan data
-let manualTyping = false;  // Track if you are manually typing in an input
+// Check if the current page is the "Scan" page
+if (window.location.href.includes('page=scan')) {
+    let scanData = '';  // To accumulate QR code scan data
+    let manualTyping = false;  // Track if you are manually typing in an input
 
-// Listen for the focus event on input fields to stop scanner input
-document.querySelectorAll('input, textarea').forEach((element) => {
-    element.addEventListener('focus', function() {
-        manualTyping = true;  // User is typing, so disable scanner input
+    // Listen for the focus event on input fields to stop scanner input
+    document.querySelectorAll('input, textarea').forEach((element) => {
+        element.addEventListener('focus', function () {
+            manualTyping = true;  // User is typing, so disable scanner input
+        });
+
+        element.addEventListener('blur', function () {
+            manualTyping = false; // Input has lost focus, enable scanner input
+        });
     });
 
-    element.addEventListener('blur', function() {
-        manualTyping = false; // Input has lost focus, enable scanner input
-    });
-});
+    // Function to listen for the keydown event globally
+    document.addEventListener('keydown', function (event) {
+        // Check if we should ignore the scanner input (when typing in a text field)
+        if (manualTyping) return;  // Ignore scanner input while typing
 
-// Function to listen for the keydown event globally
-document.addEventListener('keydown', function(event) {
-    // Check if we should ignore the scanner input (when typing in a text field)
-    if (manualTyping) return;  // Ignore scanner input while typing
-
-    // If not typing and scanner input is detected (i.e., a key is pressed)
-    if (event.key.length === 1) {
-        scanData += event.key; // Accumulate the scanned characters
-    }
-
-    // If the Enter key is pressed, process the scanned data
-    if (event.key === 'Enter' && scanData) {
-        event.preventDefault();  // Prevent the default action of the Enter key
-        processScanData();       // Process the accumulated scan data
-    }
-});
-
-// Function to process the scanned QR code data
-function processScanData() {
-    try {
-        let data = JSON.parse(scanData);  // Attempt to parse the scanned data as JSON
-        if (data.nurse_id) {
-            // If nurse_id exists, redirect to the relevant profile page
-            const nurseId = data.nurse_id;
-            window.location.href = `index.php?page=nurses&subpage=profile&id=${nurseId}`;
-        } else {
-            console.error("nurse_id not found in scanned data");
+        // If not typing and scanner input is detected (i.e., a key is pressed)
+        if (event.key.length === 1) {
+            scanData += event.key; // Accumulate the scanned characters
         }
-    } catch (e) {
-        console.error("Invalid JSON format", e);  // Handle invalid scan data format
+
+        // If the Enter key is pressed, process the scanned data
+        if (event.key === 'Enter' && scanData) {
+            event.preventDefault();  // Prevent the default action of the Enter key
+            processScanData();       // Process the accumulated scan data
+        }
+    });
+
+    // Function to process the scanned QR code data
+    function processScanData() {
+        try {
+            let data = JSON.parse(scanData);  // Attempt to parse the scanned data as JSON
+            if (data.nurse_id) {
+                // If nurse_id exists, redirect to the relevant profile scanning page
+                const nurseId = data.nurse_id;
+                window.location.href = `index.php?page=scan&subpage=profile&id=${nurseId}`;
+            } else {
+                console.error("nurse_id not found in scanned data");
+            }
+        } catch (e) {
+            console.error("Invalid JSON format", e);  // Handle invalid scan data format
+        }
+        scanData = '';  // Clear scan data after processing
     }
-    scanData = '';  // Clear scan data after processing
+} else {
+    // Disable scanning functionality on other pages by doing nothing
+    console.log("QR scanning disabled on this page.");
 }
+
+
 
 
 
@@ -355,9 +363,9 @@ function updateSelectedNurses() {
 }
 
 // DISABLE RIGHT CLICK
-$(document).on("contextmenu", function(e) {
-    return false; 
-});
+//$(document).on("contextmenu", function(e) {
+//    return false; 
+//});
 
 
 // REPORTS
@@ -404,7 +412,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 
         function fetchNurseData(departmentId) {
-            fetch('reports-module/fetch_nurse_report.php?department=' + encodeURIComponent(departmentId))
+            fetch('processes/process.nurse.php?action=fetch_by_department&department_id=' + encodeURIComponent(departmentId))
                 .then(response => response.json())
                 .then(data => {
                     if (data.available_nurses !== undefined && data.total_nurses !== undefined) {
@@ -487,3 +495,69 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    const ctxDonut = document.getElementById('donutChart').getContext('2d');
+
+    // Initialize Donut Chart
+    let donutChart = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+            labels: ['Available Nurses', 'Pending Leaves'], // Adjust labels as needed
+            datasets: [{
+                label: 'Overview',
+                data: [0, 0], // Initial values
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.6)', // Available Nurses
+                    'rgba(255, 99, 132, 0.6)', // Pending Leaves
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)',
+                ],
+                borderWidth: 1,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            return `${label}: ${value}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Fetch data for Donut Chart
+    function updateDonutChart() {
+        const departmentId = document.getElementById('departmentSelect')?.value || 'all';
+        Promise.all([
+            fetch(`reports-module/fetch_nurse_report.php?department=${encodeURIComponent(departmentId)}`)
+                .then(response => response.json()),
+            fetch(`reports-module/fetch_leave_report.php?department=${encodeURIComponent(departmentId)}`)
+                .then(response => response.json())
+        ]).then(([nurseData, leaveData]) => {
+            const availableNurses = nurseData?.available_nurses || 0;
+            const pendingLeaves = leaveData?.pending_leaves || 0;
+
+            donutChart.data.datasets[0].data = [availableNurses, pendingLeaves];
+            donutChart.update();
+        }).catch(error => console.error('Error fetching data for donut chart:', error));
+    }
+
+    // Fetch and update data on page load and department change
+    updateDonutChart();
+
+    const departmentSelect = document.getElementById('departmentSelect');
+    if (departmentSelect) {
+        departmentSelect.addEventListener('change', updateDonutChart);
+    }
+});
+
+

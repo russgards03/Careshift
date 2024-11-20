@@ -1,5 +1,18 @@
+<?php
+$admin_id = $admin->get_id_by_username($_SESSION['adm_username']);
+$access_id = $admin->get_access_id($admin_id);
+$scheduler_department_id = $admin->get_department_id($admin_id);
+
+if ($access_id == 3) {
+    $leaves = $leave->list_leaves_by_department($scheduler_department_id);
+} else {
+    $leaves = $leave->list_leaves();
+}
+?>
+
 <div class="heading">
     <h1><i class="fas fa-regular fa-paste"></i>&nbspLeave Applicants</h1>
+    <a href="index.php?page=leave" class="right_button"><i class="fa fa-list-ol" aria-hidden="true"></i>&nbspLeave List</a>
     <a href="index.php?page=leave&subpage=add" class="right_button"><i class="fa fa-file-pen" aria-hidden="true"></i>&nbspApply Leave</a>
 </div>
 <span class="right">
@@ -24,8 +37,8 @@
     <tbody>
     <?php
     /* Display each leaves record located in the database */
-    if ($leave->list_leaves() != false) {
-        foreach ($leave->list_leaves() as $value) {
+    if ($leaves != false) {
+        foreach ($leaves as $value) {
             extract($value);
             // Create a link for each row using the nurse_id
             $row_url = "index.php?page=leave&subpage=profile&id=" . $leave_id;
@@ -48,7 +61,7 @@
                 <td><?php echo $leave->get_leave_start_date($leave_id);?></td>
                 <td><?php echo $leave->get_leave_end_date($leave_id);?></td>
                 <td><?php echo $leave_type; ?></td>
-                <td class="<?php echo $status_class; ?>">
+                <td><p class="<?php echo $status_class; ?>">
                     <?php echo $leave_status; ?>
                 </td>
             </tr>

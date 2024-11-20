@@ -1,6 +1,12 @@
 <div class="heading">
     <h1><i class="fas fa-solid fa-clock"></i>&nbspGenerate Schedule</h1>
     <a href="index.php?page=schedule" class="right_button"><i class="fa fa-list-ol" aria-hidden="true"></i>&nbspSchedules List</a>
+    <a href="index.php?page=schedule&subpage=calendar" class="right_button"><i class="fa fa-calendar"></i>&nbspCalendar</a>
+    
+<?php if ($useraccess_id != 2 ): ?>
+    <a href="index.php?page=schedule&subpage=add" class="right_button"><i class="fa fa-plus"></i>&nbspAdd Sched</a>
+    <a href="index.php?page=schedule&subpage=generate" class="right_button"><i class="fa fa-plus"></i>&nbspGenerate</a>
+<?php endif; ?>
 </div>
 
 <div class="add_form_wrapper">
@@ -13,8 +19,8 @@
                 <div class="dropdown-options" id="dropdownOptions">
                     <label><input type="checkbox" id="selectAll" onclick="toggleSelectAll()"> Select All</label>
                         <?php
-                        if($nurse->list_nurses() != false){
-                            foreach($nurse->list_nurses() as $value){
+                        if($nurses != false){
+                            foreach($nurses as $value){
                                 extract($value);
                                 echo '<label><input type="checkbox" value="'.$nurse_id.'" class="nurse-option" onchange="updateSelectedNurses()"> '.$nurse_fname.' '.$nurse_mname.' '.$nurse_lname.'</label>';
                             }

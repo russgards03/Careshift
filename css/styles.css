@@ -10,7 +10,7 @@
 }
 
 body{
-    background: #f3f5f9;
+    background: #F0F4F8;
 }
 
 .wrapper{
@@ -22,19 +22,28 @@ body{
     position: fixed;
     width: 250px;
     height: 100%;
-    background: #181a1d;
+    background: #F0F4F8;
     padding: 30px 0;
     z-index: 999;
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.wrapper .sidebar img{
+    width: 100px;
+    height: 100px;
+    display: block;        /* Makes the image a block element */
+    margin: 0 auto;  
 }
 
 .wrapper .sidebar h2{
-    color: white;
+    color: #181a1d;
     text-align: center;
+    margin-top: 10px;
     margin-bottom: 30px;
 }
 
 .wrapper .sidebar h3{
-    color: white;
+    color: #181a1d;
     font-size: 20px;
     margin-top: 25px;
     margin-left: 10px;
@@ -43,34 +52,38 @@ body{
 .wrapper .sidebar ul li{
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     border-top: 1px solid rgba(255, 255, 255, 0.05);
+    transition: 0.3s;
 }
 
 .wrapper .sidebar ul li a{
-    color: white;
+    color: #181a1d;
     display: block;
     padding: 15px 15px 15px 35px;
+    transition: 0.3s;
 }
 
 .wrapper .sidebar ul li a .fas{
     width: 25px;
+    transition: 0.1s;
 }
 
 .wrapper .sidebar ul li a.active {
-    background-color: #29ce7a;
-    color: #181a1d;
+    background-color: #7BB9FA;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .wrapper .sidebar ul li a.active .fas {
-    color: #181a1d;
+    color: #ffffff;
 }
 
 
 .wrapper .sidebar ul li:hover{
-    background: #ffffff;
+    background: #181a1d;
 }
 
 .wrapper .sidebar ul li:hover a{
-    color: #000000;
+    color: #ffffff;
 }
 
 .wrapper .body{
@@ -80,7 +93,7 @@ body{
 
 .wrapper .body .header {
     padding: 20px;
-    background: #29ce7a;
+    background: #7BB9FA;
     display: flex;
     justify-content: flex-end;
     gap: 20px;
@@ -91,23 +104,36 @@ body{
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Adds shadow below the header */
 }
 
+.wrapper .body .header a{
+    text-decoration: none;
+    color: white;
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.wrapper .body .header a:hover{
+    text-decoration: none;
+    color: rgb(0, 0, 0);
+    text-transform: uppercase;
+    font-weight: 800;
+    transition: 0.3s;
+}
 
 .wrapper .body .header h3{
     margin: 0;
+    color: white;
 }
 
 .wrapper .body .main_content{
     padding: 0px 30px 0px 30px;
 }
 .wrapper .body .main_content h1{
-    font-size: 50px;
-    margin-bottom: 30px;
+    font-size: 2.4rem;
     width: 80%;
 }
 .wrapper .body .main_content .content_wrapper{
     background: white;
     box-shadow: 0 0 10px 5px #CBD4DF;
-    padding: 20px;
     margin-top: 30px;
     margin-bottom: 30px;
 }
@@ -116,34 +142,30 @@ body{
     display: flex;
     justify-content: space-between; /* This will push h1 to the left and button to the right */
     align-items: center;
+    background-color: #f2f2f2;
+    padding: 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .heading .right_button{
     padding: 10px 20px;
-    background-color: #29ce7a;
+    width: 250px;
+    background-color: #7BB9FA;
     color: white;
     border: none;
     cursor: pointer;
     font-size: 20px;
+    margin-left: 5px;
+
+    display: flex; /* Enables flexbox */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    text-align: center; /* Aligns text (fallback) */
 }
 
 .heading .right_button:hover {
-    background-color: #27b46b;
-}
-
-.heading #addScheduleBtn {
-    margin: 0px 10px 0px 10px;
-    width: 250px;
-}
-
-.heading #multipleScheduleBtn {
-    margin: 0px 10px 0px 10px;
-    width: 250px;
-}
-
-.heading #generateScheduleBtn {
-    margin: 0px 0px 0px 10px;
-    width: 250px;
+    background-color: #5A9FE3;
+    transition: 0.2s;
 }
 
 #nurseForm label {
@@ -159,11 +181,11 @@ body{
 }
 
 .right .search_bar {
-    margin-bottom: 10px;
+    margin: 10px;
 }
 
 .right .search_bar label {
-    font-size: 25px;
+    font-size: 1.3rem;
     margin-bottom: 10px;
     font-weight: normal;
 }
@@ -171,7 +193,7 @@ body{
 .search_bar input[type="text"] {
     padding: 3px;              /* Padding for the input field */
     width: 250px;              /* Set a fixed width */
-    font-size: 20px;           /* Font size for the input text */
+    font-size: 1.3rem;           /* Font size for the input text */
     border-radius: 4px;       /* Rounded corners for the input */
     margin-left: 10px;         /* Space between label and input */
 }
@@ -180,20 +202,64 @@ body{
     transition: box-shadow 0.3s ease; /* Smooth transition */
 }
 
+.nav-button {
+    margin: 10px;
+    padding: 10px 20px;
+    width: 100px;
+    background-color: #7BB9FA;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    margin-left: 5px;
+
+    display: flex; /* Enables flexbox */
+    justify-content: center; /* Centers content horizontally */
+    align-items: center; /* Centers content vertically */
+    text-align: center; /* Aligns text (fallback) */
+}
+
+.nav-button:hover{
+    background-color: #5A9FE3;
+	color: #ffffff;
+	transition: 0.2s;
+}
+
+.schedule_table_header{
+    display: flex;
+    justify-content: space-between;
+}
+
+.schedule_table_header h2{
+    font-size: 30px;
+    margin: 20px;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.1rem;
+}
+
 #tablerecords{
 	padding: 10px;
-	/*border-collapse: collapse;*/
+	box-shadow: 0 5px 10px #CBD4DF;
 	width: 100%;
+    background-color: white;
+    text-align: left;
+    overflow: hidden;
     border-collapse: collapse; /* Ensures that borders are merged for cleaner look */
 }
 #tablerecords thead{
-	color: white;
-	background-color: #181a1d;
-	text-align: left;
-    font-size: 30px;
+	color: #181a1d;
+    
+    box-shadow: 0 5px 10px #CBD4DF;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 #tablerecords thead tr th{
-	padding: 10px 20px 10px 20px;
+    padding: 1rem 2rem;
+	text-transform: uppercase;
+    font-size: 20px;
+    font-weight: 900;
+    
 }
 #tablerecords th, /* Add border to the table headers */
 #tablerecords td { /* Add border to the table data cells */
@@ -204,40 +270,55 @@ body{
 }
 
 #tablerecords tbody tr:nth-child(odd) {
-    background-color: #f2f2f2; /* Light gray for odd rows */
+    background-color: #ffffff; /* Light gray for odd rows */
 }
 
 #tablerecords tbody tr:nth-child(even) {
-    background-color: #ffffff; /* White for even rows */
+    background-color: #f2f2f2; /* White for even rows */
 }
 
 
 #tablerecords tbody tr td{
-	padding: 10px 20px 10px 20px;
+	padding: 1rem 2rem;
 }
 #tablerecords tbody tr:hover{
-    background-color: #27b46b;
+    background-color: #5A9FE3;
 	color: #ffffff;
 	transition: 0.2s;
 }
 
 .leave-status-denied {
+    border-radius: 5px;
+    color: rgb(122, 28, 28);
+    padding: 0.2rem 1rem;
+    text-align: center;
     background-color: rgb(255, 125, 125);
 }
 
 .leave-status-approved {
+    border-radius: 5px;
+    color: rgb(20, 100, 20);
+    padding: 0.2rem 1rem;
+    text-align: center;
     background-color: rgb(118, 255, 118);
 }
 
 .leave-status-pending {
-    background-color: rgb(248, 246, 137);
+    border-radius: 5px;
+    color: rgb(117, 95, 20);
+    padding: 0.2rem 1rem;
+    text-align: center;
+    background-color: rgb(248, 222, 137);
 }
 
 
-
+.leave-date-and-time {
+    margin: 20px 20px 0px 20px;
+}
 
 .add_form_wrapper{
-    margin: 10px 100px 10px 100px;
+    margin: 40px 100px 40px 100px;
+    padding: 20px;
 }
 .add_form {
     display: flex;
@@ -302,6 +383,7 @@ label {
 
 .submit-btn:hover {
     background-color: #27b46b;
+    transition: 0.2s;
 }
 
 .delete-btn {
@@ -319,6 +401,7 @@ label {
 
 .delete-btn:hover {
     background-color: #e64949;
+    transition: 0.2s;
 }
 
 
@@ -328,6 +411,7 @@ label {
     align-items: center;     /* Center content vertically (if needed) */
     gap: 10px; /* Space between items */
     margin: auto;
+    background-color: white;
 }
 
 .content_layer1_wrapper #nurses_report,
@@ -346,12 +430,56 @@ label {
 
 
 
+.qr_container {
+    width: 80%;
+    height: 600px;
+    margin: 20px auto 20px; /* Centers the element horizontally, adds margin-top and margin-bottom */
 
+    display: flex; /* Enables flexbox layout */
+    flex-direction: column; /* Stacks content vertically */
+    align-items: center; /* Centers horizontally */
+    text-align: center; /* Ensures text inside is centered */
+}
 
+.qr_container h1 {
+    font-size: 2000px;
+    margin-top: 40px;
+}
 
+.qr_container i {
+    margin-top: 60px;
+    font-size: 250px;
+}
 
+.qr_profile_container {
+    width: 100%;
+    height: 600px;
+    margin: 0 0 20px 0; /* Centers the element horizontally, adds margin-top and margin-bottom */
+    display: flex; /* Enables flexbox layout */
+    flex-direction: column; /* Stacks content vertically */
+    align-items: center; /* Centers horizontally */
+    background-color: white;
+}
 
+.qr_profile_container p{
+    font-size: 25px;
+}
 
+.bold {
+    font-weight: bold;
+}
+
+.qr_wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+    margin-top: 100px;
+}
+
+.qr_text{
+    display: flex;
+    flex-direction: column;
+}
 
 
 
@@ -435,15 +563,13 @@ label {
 /* Calendar container */
 #calendar {
     max-width: 100%;
-    margin: 20px auto;
-    padding: 10px;
+    padding: 20px 10px 10px 10px;
     background-color: #ffffff; /* Light background */
     border: 1px solid #ddd; /* Border around the calendar */
-    box-shadow: 0 0 10px 5px #CBD4DF;
 }
 
 .fc-button {
-    background: #29ce7a !important;
+    background: #7BB9FA !important;
     border: none !important;
     color: white !important;
     padding-bottom: 0px !important;
@@ -452,8 +578,9 @@ label {
 
 /* Remove hover styles */
 .fc-button:hover {
-    background: #0f9753 !important;
+    background: #5A9FE3 !important;
     color: white !important;
+    transition: 0.2s !important;
 }
 
 #calendar .fc-day-today {
@@ -464,39 +591,70 @@ label {
 
 /* Remove default text styles */
 .fc h2, .fc h3, .fc h4, .fc h5, .fc h6 {
-    font-size: 40px !important;
-    font-weight: bold !important;
+    font-size: 30px !important;
+    font-weight: 800 !important;
     color: inherit !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1rem !important;
 }
 
 /* Reset event styles */
 .fc-event {
-    background: #29ce7a !important;
+    background: #7BB9FA !important;
     border: black solid 1px !important;
     color: white !important;
+    font-size: 20px !important; /* Desired font size */
 }
 
 /* Target the header container */
 #calendar .fc-head-container {
-    font-size: 30px !important; /* Desired font size */
-    font-weight: bold !important;
-    color: #000000 !important;
+    font-size: 20px !important; /* Desired font size */
+    font-weight: 900 !important;
+    color: white !important;
+    background: #7BB9FA !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.1rem !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    box-shadow: 0 5px 10px #CBD4DF;
 }
 
 /* Style day numbers */
 #calendar .fc-day-top {
-    font-size: 25px !important; /* Adjust to desired size */
+    font-size: 20px !important; /* Adjust to desired size */
     color: #000000 !important; /* Change to desired color */
-    font-weight: bold; /* Optional: Change weight */
+    font-weight: 450 !important; /* Optional: Change weight */
+    letter-spacing: 0.1rem !important;
+}
+
+/* Style for the list view's event title */
+#calendar .fc-list-heading {
+    font-size: 30px !important; /* Adjust to desired size */
+    color: #000000 !important; /* Text color */
+    font-weight: 600 !important; /* Optional: Make it bolder */
+    letter-spacing: 0.05rem !important;
 }
 
 
+/*CALENDAR LIST VIEW*/
 
+#calendar .fc-list-item-time{
+    font-size: 20px !important; /* Adjust to desired size */
+    color: #000000 !important; /* Text color */
+    font-weight: 600 !important; /* Optional: Make it bolder */
+    letter-spacing: 0.1rem !important;
+}
 
+#calendar .fc-list-item-title{
+    font-size: 20px !important; /* Adjust to desired size */
+    color: #000000 !important; /* Text color */
+    font-weight: 600 !important; /* Optional: Make it bolder */
+    letter-spacing: 0.1rem !important;
+}
 
-
-
-
+#calendar .fc-list-item-marker .fc-event-dot{
+    background-color: #7BB9FA !important;
+}
 
 /* The Modal (background) */
 .modal {
@@ -563,6 +721,7 @@ label {
 
 .modal-content button[type="submit"]:hover {
     background-color: #27b46b;
+    transition: 0.2s;
 }
 
 /* The Close Button */
@@ -578,6 +737,7 @@ label {
     color: black;
     text-decoration: none;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 #qr-reader {
@@ -624,6 +784,7 @@ label {
 
 .dropdown-options label:hover {
     background-color: #f0f0f0;
+    transition: 0.2s;
 }
 
 

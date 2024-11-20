@@ -71,6 +71,13 @@ class Nurse{
 		}
 	}
 
+	public function list_nurses_by_department($department_id) {
+        $sql = "SELECT * FROM nurse WHERE department_id = :department_id";  
+        $q = $this->conn->prepare($sql);
+        $q->execute(['department_id' => $department_id]);
+        return $q->fetchAll(PDO::FETCH_ASSOC); 
+    }
+
 	public function countAvailableNursesByDepartment($departmentId) {
 		$query = "SELECT COUNT(*) as count 
 				  FROM nurse n
@@ -94,11 +101,30 @@ class Nurse{
 		return $row['count'];
 	}
 
+	public function countNursesByDepartment() {
+		$query = "SELECT department, COUNT(*) as count 
+				  FROM nurse 
+				  GROUP BY department_id";
+	
+		$stmt = $this->conn->prepare($query);
+		$stmt->execute();
+		return $stmt->fetchAll(PDO::FETCH_ASSOC); 
+		// Example output: [{"department": "ICU", "count": 10}, {"department": "ER", "count": 15}]
+	}
+
 	/*Function for getting the nurse id from the database */
 	function get_id($id){
 		$sql="SELECT nurse_id FROM nurse WHERE nurse_id = :id";	
 		$q = $this->conn->prepare($sql);
 		$q->execute(['id' => $id]);
+		$id = $q->fetchColumn();
+		return $id;
+	}
+	/*Function for getting the nurse id from the database */
+	function get_id_by_name($nurse_fname){
+		$sql="SELECT nurse_id FROM nurse WHERE nurse_fname = :nurse_fname";	
+		$q = $this->conn->prepare($sql);
+		$q->execute(['nurse_fname' => $nurse_fname]);
 		$id = $q->fetchColumn();
 		return $id;
 	}

@@ -1,5 +1,4 @@
 <?php
-
 include_once 'class/class.nurse.php';
 include_once 'class/class.admin.php';
 include_once 'class/class.logs.php';
@@ -31,12 +30,14 @@ $status = new Status();
 $dept_type = new Dept_Type();
 $schedule = new Schedule();
 
-/*Login Verifier (Deploys Login Check Method from another file)*/
 if(!$admin->get_session()){
-	header("location: login.php");
+    header("location: login.php");
 }
+
 $admin_id = $admin->get_id_by_username($_SESSION['adm_username']);
 $admin_user_login = $admin_id;
+
+$useraccess_id = $admin->get_access_id($admin_id);
 
 ?>
 
@@ -53,28 +54,42 @@ $admin_user_login = $admin_id;
     <script src="https://kit.fontawesome.com/e697cf1067.js" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" href="img/logo.png" />
 </head>
 <body>
     <div class="wrapper">
         <div class="sidebar">
+            <img src="img/logo.png" alt="Logo Image" class="logo_image">
             <h2>CareShift</h2>
             <ul>
                 <h3>Main</h3>
                 <li><a href="index.php?page=reports" class="<?= $page == 'reports' ? 'active' : '' ?>"><i class="fas fa-solid fa-chart-line"></i>Reports</a></li>
                 <li><a href="index.php?page=schedule" class="<?= $page == 'schedule' ? 'active' : '' ?>"><i class="fas fa-solid fa-clock"></i>Schedule</a></li>
+
+                <?php if ($useraccess_id != 2 && $useraccess_id != 3): ?>
                 <li><a href="index.php?page=logs" class="<?= $page == 'logs' ? 'active' : '' ?>"><i class="fas fa-solid fa-receipt"></i>Logs</a></li>
-                <li><a href="index.php?page=leave" class="<?= $page == 'leave' ? 'active' : '' ?>"><i class="fas fa-regular fa-paste"></i></i></i>Leave Applicants</a></li>
+                <?php endif; ?>
+
+                <li><a href="index.php?page=scan" class="<?= $page == 'scan' ? 'active' : '' ?>"><i class="fas fa-solid fa-qrcode"></i>Scan QR Nurses</a></li>
+
+                <li><a href="index.php?page=leave" class="<?= $page == 'leave' ? 'active' : '' ?>"><i class="fas fa-regular fa-paste"></i>Leave Applicants</a></li>
 
                 <h3>Users</h3>
                 <li><a href="index.php?page=nurses" class="<?= $page == 'nurses' ? 'active' : '' ?>"><i class="fas fa-solid fa-user-nurse"></i>Nurses</a></li>
+
+                <?php if ($useraccess_id != 2 && $useraccess_id != 3): ?>
                 <li><a href="index.php?page=admins" class="<?= $page == 'admins' ? 'active' : '' ?>"><i class="fas fa-lock" aria-hidden="true"></i></i>Admins</a></li>
+                <?php endif; ?>
 
                 <h3>Master List</h3>
                 <li><a href="index.php?page=rooms" class="<?= $page == 'rooms' ? 'active' : '' ?>"><i class="fas fa-solid fa-door-closed"></i>Rooms</a></li>
                 <li><a href="index.php?page=departments" class="<?= $page == 'departments' ? 'active' : '' ?>"><i class="fas fa-solid fa-users-line"></i>Departments</a></li>
 
+                <?php if ($useraccess_id != 2 && $useraccess_id != 3): ?>
                 <h3>Settings</h3>
                 <li><a href="index.php?page=useraccess" class="<?= $page == 'useraccess' ? 'active' : '' ?>"><i class="fas fa-solid fa-user-shield"></i>User Access</a></li>
+                <?php endif; ?>
+
             </ul>
         </div>
         <div class="body">
@@ -97,6 +112,10 @@ $admin_user_login = $admin_id;
                     /*Displays Logs Page*/
                     case 'logs':
                         require_once 'logs-module/index.php';
+                    break;
+                    /*Displays Scanning Page*/
+                    case 'scan':
+                        require_once 'scan-module/index.php';
                     break;
                     /*Displays Leave Page*/
                     case 'leave':
